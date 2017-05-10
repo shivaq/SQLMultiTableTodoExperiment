@@ -48,7 +48,9 @@ dependencies {
     compile "com.facebook.stetho:stetho-okhttp3:$rootProject.stethoVersion"
     compile "com.squareup.picasso:picasso:$rootProject.picassoVersion"
     // sqldelight
-    
+    annotationProcessor 'com.google.auto.value:auto-value:1.3'
+    provided 'com.google.auto.value:auto-value:1.3'
+    provided 'javax.annotation:jsr250-api:1.0'
 
     // dependency injection
     compile "com.google.dagger:dagger:$rootProject.dagger2Version"
@@ -70,7 +72,6 @@ dependencies {
 
     // ui test
     androidTestCompile "com.android.support.test.espresso:espresso-core:$rootProject.espressoVersion"
-
     androidTestCompile "com.android.support.test.espresso:espresso-intents:$rootProject.espressoVersion"
 
     androidTestCompile "org.mockito:mockito-core:$rootProject.mockitoVersion"
@@ -79,8 +80,6 @@ dependencies {
     androidTestCompile "org.assertj:assertj-core:$rootProject.assertJ"
     androidTestAnnotationProcessor "com.google.dagger:dagger-compiler:$rootProject.dagger2Version"
 
-    // assertJ addon
-    
     // Android Testing Support Library's runner and rules
     androidTestCompile "com.android.support.test:runner:$rootProject.runnerVersion"
     androidTestCompile "com.android.support.test:rules:$rootProject.runnerVersion"
