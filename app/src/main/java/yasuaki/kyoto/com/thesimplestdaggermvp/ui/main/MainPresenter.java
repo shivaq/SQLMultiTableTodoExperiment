@@ -1,4 +1,4 @@
-package yasuaki.kyoto.com.thesimplestdaggermvp.ui;
+package yasuaki.kyoto.com.thesimplestdaggermvp.ui.main;
 
 import javax.inject.Inject;
 import yasuaki.kyoto.com.thesimplestdaggermvp.Utility;
@@ -35,5 +35,6 @@ public class MainPresenter implements BasePresenter<MainMvpView> {
 
   public void loadTodo() {
       mainMvpView.setTodo(Utility.dummyTodoCreater());
+      // TODO:fetch data from DB
   }
 }

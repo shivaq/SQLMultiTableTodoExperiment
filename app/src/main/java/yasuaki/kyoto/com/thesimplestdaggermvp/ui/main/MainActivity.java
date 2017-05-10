@@ -1,16 +1,19 @@
-package yasuaki.kyoto.com.thesimplestdaggermvp.ui;
+package yasuaki.kyoto.com.thesimplestdaggermvp.ui.main;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import java.util.List;
 import javax.inject.Inject;
 import yasuaki.kyoto.com.thesimplestdaggermvp.R;
 import yasuaki.kyoto.com.thesimplestdaggermvp.di.ApplicationContext;
 import yasuaki.kyoto.com.thesimplestdaggermvp.di.component.ActivityComponent;
+import yasuaki.kyoto.com.thesimplestdaggermvp.ui.add.AddEditActivity;
 import yasuaki.kyoto.com.thesimplestdaggermvp.ui.base.BaseActivity;
 
 public class MainActivity extends BaseActivity implements MainMvpView {
@@ -27,6 +30,7 @@ public class MainActivity extends BaseActivity implements MainMvpView {
   // RecyclerViews
   @BindView(R.id.recycler_subject)
   RecyclerView rvMain;
+
 
   public MainActivity() {
   }
@@ -61,5 +65,11 @@ public class MainActivity extends BaseActivity implements MainMvpView {
   @Override
   public void setTodo(List<String> strings) {
     mainRvAdapter.setTodoList(strings);
+  }
+
+  @OnClick(R.id.fab_add_todo)
+  void onAddFabClicked(){
+    Intent intent = new Intent(this, AddEditActivity.class);
+    startActivity(intent);
   }
 }

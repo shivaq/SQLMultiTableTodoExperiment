@@ -1,4 +1,4 @@
-package yasuaki.kyoto.com.thesimplestdaggermvp.ui;
+package yasuaki.kyoto.com.thesimplestdaggermvp.ui.main;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
 import yasuaki.kyoto.com.thesimplestdaggermvp.R;
-import yasuaki.kyoto.com.thesimplestdaggermvp.ui.MainRvAdapter.MainRvViewHolder;
+import yasuaki.kyoto.com.thesimplestdaggermvp.ui.main.MainRvAdapter.MainRvViewHolder;
 
 /**
  * Created by Yasuaki on 2017/05/09.
