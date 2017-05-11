@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <android.support.constraint.ConstraintLayout
+  android:id="@+id/container_act_add"
   xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:app="http://schemas.android.com/apk/res-auto"
   xmlns:tools="http://schemas.android.com/tools"
@@ -14,7 +15,7 @@
     android:layout_marginLeft="8dp"
     android:layout_marginRight="8dp"
     android:hint="Add Todo"
-    android:maxLines="1"
+    android:inputType="text"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintHorizontal_bias="0.0"
     app:layout_constraintLeft_toLeftOf="parent"
@@ -32,6 +33,7 @@
     android:layout_marginRight="8dp"
     android:hint="Add Tag"
     android:maxLines="1"
+    android:inputType="text"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintHorizontal_bias="0.0"
     app:layout_constraintLeft_toLeftOf="parent"
@@ -48,6 +50,7 @@
     android:layout_marginLeft="8dp"
     android:layout_marginRight="8dp"
     app:fabSize="normal"
+    app:layout_anchor="@id/container_act_add"
     app:layout_anchorGravity="bottom|right|end"
     app:layout_constraintBottom_toBottomOf="parent"
     app:layout_constraintHorizontal_bias="1.0"

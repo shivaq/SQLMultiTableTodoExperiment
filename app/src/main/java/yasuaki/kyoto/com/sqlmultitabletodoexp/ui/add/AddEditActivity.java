@@ -51,6 +51,10 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
   @OnClick(R.id.fab_todo_edit_ok)
   void onOkClicked(){
     String addedTodo = editTodo.getText().toString();
+    if (addedTodo.length() == 0) {
+      closeActivity();
+      return;
+    }
     addEditPresenter.saveTodo(addedTodo);
   }
 }
