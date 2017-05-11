@@ -7,7 +7,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import rx.Observable;
 import rx.functions.Func1;
-import timber.log.Timber;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.local.DbCrudHelper;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Todo;
 
@@ -26,11 +25,11 @@ public class DataManager {
   }
 
   public Observable<List<Todo>> loadTodo() {
-    Timber.d("DataManager:loadTodo: ");
 
     return dbCrudHelper.loadTodo()
+        // カーソルを、List に変換する
+        // map →Observable が emit した各アイテムに、function を適用していく
         .map(new Func1<Cursor, List<Todo>>(){
-
           @Override
           public List<Todo> call(Cursor cursor) {
 
@@ -39,7 +38,6 @@ public class DataManager {
               if (cursor.moveToFirst()) {
                 for(int i = 0; i < cursor.getCount(); i++){
                   Todo todo = Todo.MAPPER.map(cursor);
-                  Timber.d("DataManager:call: todo is %s", todo);
                   todoList.add(todo);
                   cursor.moveToNext();
                 }
@@ -50,5 +48,9 @@ public class DataManager {
             return todoList;
           }
         });
+  }
+
+  public void insertTodo(String todo) {
+    dbCrudHelper.insertTodo(todo);
   }
 }

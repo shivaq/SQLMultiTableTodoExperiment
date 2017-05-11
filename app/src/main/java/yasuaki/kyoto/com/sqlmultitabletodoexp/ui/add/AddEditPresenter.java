@@ -25,6 +25,7 @@ public class AddEditPresenter implements BasePresenter<AddEditMvpView> {
   }
 
   public void saveTodo(String todo) {
-    //TODO: Add data to DB
+    dataManager.insertTodo(todo);
+    addEditMvpView.closeActivity();
   }
 }

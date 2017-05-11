@@ -8,5 +8,5 @@ import yasuaki.kyoto.com.sqlmultitabletodoexp.ui.base.BaseMvpView;
 
 public interface AddEditMvpView extends BaseMvpView{
 
-
+  void closeActivity();
 }

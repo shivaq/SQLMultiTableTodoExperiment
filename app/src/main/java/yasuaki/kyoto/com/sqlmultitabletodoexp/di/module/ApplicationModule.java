@@ -6,7 +6,7 @@ import dagger.Module;
 import dagger.Provides;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.di.ApplicationContext;
 
-@Module(includes = {DbModule.class})
+@Module
 public class ApplicationModule {
 
     private final Application mApplication;

@@ -10,6 +10,7 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import java.util.List;
 import javax.inject.Inject;
+import timber.log.Timber;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.R;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Todo;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.di.ApplicationContext;
@@ -55,6 +56,14 @@ public class MainActivity extends BaseActivity implements MainMvpView {
     rvMain.setLayoutManager(mainTodoLM);
     rvMain.setHasFixedSize(true);
     rvMain.setAdapter(mainRvAdapter);
+    Timber.d("MainActivity:onCreate: ");
+  }
+
+  @Override
+  protected void onResume() {
+    super.onResume();
+    Timber.d("MainActivity:onResume: ");
+    mainPresenter.loadTodo();
   }
 
   @Override
@@ -66,6 +75,9 @@ public class MainActivity extends BaseActivity implements MainMvpView {
   @Override
   public void setTodo(List<Todo> todoList) {
     mainRvAdapter.setTodoList(todoList);
+    // load したリストを Rv の Adapter にセットし、
+    // その Adapter を Rv に再セットすることで、load した結果がスクリーンに反映される
+    rvMain.setAdapter(mainRvAdapter);
   }
 
   @OnClick(R.id.fab_add_todo)
