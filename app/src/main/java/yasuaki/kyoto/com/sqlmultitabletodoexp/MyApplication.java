@@ -1,6 +1,7 @@
 package yasuaki.kyoto.com.sqlmultitabletodoexp;
 
 import android.app.Application;
+import com.facebook.stetho.Stetho;
 import javax.inject.Inject;
 import timber.log.Timber;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.DataManager;
@@ -32,6 +33,20 @@ public class MyApplication extends Application {
       Timber.uprootAll();
       Timber.plant(new Timber.DebugTree());
     }
+
+    // setup stetho
+    Stetho.InitializerBuilder initializerBuilder =
+        Stetho.newInitializerBuilder(this);
+
+    initializerBuilder.enableWebKitInspector(
+        Stetho.defaultInspectorModulesProvider(this));
+
+    initializerBuilder.enableDumpapp(
+        Stetho.defaultDumperPluginsProvider(this)
+    );
+
+    Stetho.Initializer initializer = initializerBuilder.build();
+    Stetho.initialize(initializer);
   }
 
   public ApplicationComponent getApplicationComponent() {

@@ -4,12 +4,9 @@ import android.app.Application;
 import android.content.Context;
 import dagger.Module;
 import dagger.Provides;
-import javax.inject.Singleton;
-import yasuaki.kyoto.com.sqlmultitabletodoexp.data.AppDataManager;
-import yasuaki.kyoto.com.sqlmultitabletodoexp.data.DataManager;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.di.ApplicationContext;
 
-@Module
+@Module(includes = {DbModule.class})
 public class ApplicationModule {
 
     private final Application mApplication;
@@ -27,12 +24,6 @@ public class ApplicationModule {
     @Provides
     Application provideApplication() {
         return mApplication;
-    }
-
-    @Provides
-    @Singleton
-    DataManager provideDataManager(AppDataManager appDataManager) {
-        return appDataManager;
     }
 
 }

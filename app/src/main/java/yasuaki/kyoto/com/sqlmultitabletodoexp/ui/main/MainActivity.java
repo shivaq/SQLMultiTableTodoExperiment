@@ -11,6 +11,7 @@ import butterknife.OnClick;
 import java.util.List;
 import javax.inject.Inject;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.R;
+import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Todo;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.di.ApplicationContext;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.di.component.ActivityComponent;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.ui.add.AddEditActivity;
@@ -63,8 +64,8 @@ public class MainActivity extends BaseActivity implements MainMvpView {
   }
 
   @Override
-  public void setTodo(List<String> strings) {
-    mainRvAdapter.setTodoList(strings);
+  public void setTodo(List<Todo> todoList) {
+    mainRvAdapter.setTodoList(todoList);
   }
 
   @OnClick(R.id.fab_add_todo)

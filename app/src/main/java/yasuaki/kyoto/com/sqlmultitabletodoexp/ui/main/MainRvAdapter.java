@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.R;
+import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Todo;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.ui.main.MainRvAdapter.MainRvViewHolder;
 
 /**
@@ -21,7 +22,7 @@ import yasuaki.kyoto.com.sqlmultitabletodoexp.ui.main.MainRvAdapter.MainRvViewHo
 
 public class MainRvAdapter extends RecyclerView.Adapter<MainRvViewHolder>{
 
-  private static List<String> todoList;
+  private static List<Todo> todoList;
 
   @Inject
   MainRvAdapter(){
@@ -38,8 +39,9 @@ public class MainRvAdapter extends RecyclerView.Adapter<MainRvViewHolder>{
   @Override
   public void onBindViewHolder(MainRvViewHolder holder, int position) {
 
-    String todo = todoList.get(position);
-    holder.txtTodo.setText(todo);
+    Todo todo = todoList.get(position);
+    String todoItem = todo.todo();
+    holder.txtTodo.setText(todoItem);
   }
 
   @Override
@@ -49,7 +51,7 @@ public class MainRvAdapter extends RecyclerView.Adapter<MainRvViewHolder>{
 
   /******************  *****************/
 
-  public void setTodoList(List<String> todoList){
+  public void setTodoList(List<Todo> todoList){
     this.todoList = todoList;
   }
 
