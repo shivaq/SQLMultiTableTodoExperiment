@@ -23,6 +23,7 @@ import yasuaki.kyoto.com.sqlmultitabletodoexp.ui.main.MainRvAdapter.MainRvViewHo
 public class MainRvAdapter extends RecyclerView.Adapter<MainRvViewHolder>{
 
   private static List<Todo> todoList;
+  private RvCallback rvCallback;
 
   @Inject
   MainRvAdapter(){
@@ -42,6 +43,20 @@ public class MainRvAdapter extends RecyclerView.Adapter<MainRvViewHolder>{
     Todo todo = todoList.get(position);
     String todoItem = todo.todo();
     holder.txtTodo.setText(todoItem);
+
+    holder.cbTodo.setOnClickListener(view ->{
+      if(rvCallback != null){
+        rvCallback.onRvItemClicked(todoItem);
+      }
+    });
+//        new OnClickListener() {
+//      @Override
+//      public void onClick(View v) {
+//        if(rvCallback != null){
+//          rvCallback.onRvItemClicked(todoItem);
+//        }
+//      }
+//    });
   }
 
   @Override
@@ -55,10 +70,21 @@ public class MainRvAdapter extends RecyclerView.Adapter<MainRvViewHolder>{
     this.todoList = todoList;
   }
 
+
+  /*********************** ClickListener *****************************/
+  interface RvCallback{
+    void onRvItemClicked(String s);
+  }
+
+  public void registerRvCallback(RvCallback rvCallback){
+    this.rvCallback = rvCallback;
+  }
+
+
   /**************************************************************/
   class MainRvViewHolder extends RecyclerView.ViewHolder{
 
-    @BindView(R.id.todo_checkBox)
+    @BindView(R.id.cb_todo)
     CheckBox cbTodo;
     @BindView(R.id.todo_main)
     TextView txtTodo;

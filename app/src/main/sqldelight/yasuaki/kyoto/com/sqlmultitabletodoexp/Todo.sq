@@ -3,14 +3,15 @@ import java.util.Calendar;
 CREATE TABLE todo(
   _id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   todo TEXT NOT NULL,
+  isChecked INTEGER AS Boolean DEFAULT 0,
   registerd_date INTEGER NOT NULL,
   updated_date INTEGER NOT NULL
 
 );
 
 insert_todo:
-INSERT INTO todo(todo, registerd_date, updated_date)
-VALUES(?,?,?);
+INSERT INTO todo(todo, isChecked, registerd_date, updated_date)
+VALUES(?,?,?,?);
 
 select_all:
 SELECT *

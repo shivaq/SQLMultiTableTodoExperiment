@@ -10,7 +10,7 @@
     android:layout_height="match_parent"
     android:orientation="horizontal">
     <CheckBox
-      android:id="@+id/todo_checkBox"
+      android:id="@+id/cb_todo"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       />

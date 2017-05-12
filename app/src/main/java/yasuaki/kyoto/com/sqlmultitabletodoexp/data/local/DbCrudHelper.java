@@ -58,7 +58,7 @@ public class DbCrudHelper {
 
   public void insertTodo(String todo) {
     long now = System.currentTimeMillis();
-    insertTodo.bind(todo, now, now);
+    insertTodo.bind(todo, false, now, now);
     briteDatabase.executeInsert(insertTodo.table, insertTodo.program);
   }
 }

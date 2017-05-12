@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.widget.Toast;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -17,8 +18,9 @@ import yasuaki.kyoto.com.sqlmultitabletodoexp.di.ApplicationContext;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.di.component.ActivityComponent;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.ui.add.AddEditActivity;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.ui.base.BaseActivity;
+import yasuaki.kyoto.com.sqlmultitabletodoexp.ui.main.MainRvAdapter.RvCallback;
 
-public class MainActivity extends BaseActivity implements MainMvpView {
+public class MainActivity extends BaseActivity implements MainMvpView, RvCallback {
 
   // Inject Presenter from an object graph
   @Inject
@@ -56,6 +58,7 @@ public class MainActivity extends BaseActivity implements MainMvpView {
     rvMain.setLayoutManager(mainTodoLM);
     rvMain.setHasFixedSize(true);
     rvMain.setAdapter(mainRvAdapter);
+    mainRvAdapter.registerRvCallback(this);
     Timber.d("MainActivity:onCreate: ");
   }
 
@@ -81,8 +84,15 @@ public class MainActivity extends BaseActivity implements MainMvpView {
   }
 
   @OnClick(R.id.fab_add_todo)
-  void onAddFabClicked(){
+  void onAddFabClicked() {
     Intent intent = new Intent(this, AddEditActivity.class);
     startActivity(intent);
+  }
+
+  /********************** implement RvCallback **********************/
+  @Override
+  public void onRvItemClicked(String s) {
+    Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
+
   }
 }
