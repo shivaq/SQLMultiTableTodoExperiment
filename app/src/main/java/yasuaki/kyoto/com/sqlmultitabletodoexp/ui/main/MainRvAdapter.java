@@ -13,6 +13,7 @@ import butterknife.OnClick;
 import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
+import timber.log.Timber;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.R;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Todo;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.ui.main.MainRvAdapter.MainRvViewHolder;
@@ -46,17 +47,15 @@ public class MainRvAdapter extends RecyclerView.Adapter<MainRvViewHolder>{
     boolean isTodoChecked = todo.isChecked();
 
     long todoId = todo._id();
+    holder.txtTodo.setText(todoItem);
 
     CheckBox todoCb = holder.cbTodo;
-
-
-    holder.txtTodo.setText(todoItem);
     todoCb.setChecked(isTodoChecked);
 
     // API 24 以前にも互換性があるが、相対的にコスト高になるとのこと
     holder.cbTodo.setOnClickListener(view ->{
       if(rvCallback != null){
-          rvCallback.onRvTodoCbClicked(!isTodoChecked, todoId);
+        rvCallback.onRvTodoCbClicked(!isTodoChecked, todoId);
       }
     });
 //        new OnClickListener() {
@@ -67,6 +66,41 @@ public class MainRvAdapter extends RecyclerView.Adapter<MainRvViewHolder>{
 //        }
 //      }
 //    });
+  }
+
+
+  @Override
+  public void onViewRecycled(MainRvViewHolder holder) {
+    super.onViewRecycled(holder);
+    Timber.d("MainRvAdapter:onViewRecycled: ");
+  }
+
+  @Override
+  public void onViewAttachedToWindow(MainRvViewHolder holder) {
+    super.onViewAttachedToWindow(holder);
+    Timber.d("MainRvAdapter:onViewAttachedToWindow: ");
+  }
+
+  @Override
+  public void onViewDetachedFromWindow(MainRvViewHolder holder) {
+    super.onViewDetachedFromWindow(holder);
+    Timber.d("MainRvAdapter:onViewDetachedFromWindow: ");
+  }
+
+  @Override
+  // スクロール時にはコールされず、更新時には 2度コールされる
+  public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+    super.onAttachedToRecyclerView(recyclerView);
+    Timber.d("MainRvAdapter:onAttachedToRecyclerView: ");
+    if(rvCallback != null){
+      rvCallback.onRvRefreshed();
+    }
+  }
+
+  @Override
+  public void onDetachedFromRecyclerView(RecyclerView recyclerView) {
+    super.onDetachedFromRecyclerView(recyclerView);
+    Timber.d("MainRvAdapter:onDetachedFromRecyclerView: ");
   }
 
   @Override
@@ -85,6 +119,7 @@ public class MainRvAdapter extends RecyclerView.Adapter<MainRvViewHolder>{
   interface RvCallback{
     void onRvTodoCbClicked(boolean isChecked, long id);
     void onRvItemClicked(Todo clickedTodo);
+    void onRvRefreshed();
   }
 
   public void registerRvCallback(RvCallback rvCallback){

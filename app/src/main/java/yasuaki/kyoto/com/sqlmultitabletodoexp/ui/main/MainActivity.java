@@ -3,8 +3,10 @@ package yasuaki.kyoto.com.sqlmultitabletodoexp.ui.main;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.RecyclerView.LayoutManager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -39,6 +41,8 @@ public class MainActivity extends BaseActivity implements MainMvpView, RvCallbac
   }
 
   private ActivityComponent mActivityComponent;
+  private LayoutManager rvLayoutManager;
+  private Parcelable rvLayoutState;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -52,9 +56,9 @@ public class MainActivity extends BaseActivity implements MainMvpView, RvCallbac
     mainPresenter.onAttachMvpView(this);
     mainPresenter.loadTodo();
 
-    LinearLayoutManager mainTodoLM = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL,
+    rvLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL,
         false);
-    rvMain.setLayoutManager(mainTodoLM);
+    rvMain.setLayoutManager(rvLayoutManager);
     rvMain.setHasFixedSize(true);
     rvMain.setAdapter(mainRvAdapter);
     mainRvAdapter.registerRvCallback(this);
@@ -91,7 +95,16 @@ public class MainActivity extends BaseActivity implements MainMvpView, RvCallbac
   /********************** implement RvCallback **********************/
   @Override
   public void onRvTodoCbClicked(boolean isChecked, long id) {
+    // CheckBox クリック →スクロールポジションを保存
+    rvLayoutState = rvLayoutManager.onSaveInstanceState();
     mainPresenter.updateTodoIsChecked(isChecked, id);
+  }
+
+  @Override
+  public void onRvRefreshed() {
+    // スクロールポジションを復元
+    rvLayoutManager.onRestoreInstanceState(rvLayoutState);
+    rvMain.setLayoutManager(rvLayoutManager);
   }
 
   @Override

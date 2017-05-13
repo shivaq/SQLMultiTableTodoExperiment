@@ -23,7 +23,6 @@ public class DbOpenHelper extends SQLiteOpenHelper {
   @Override
   public void onCreate(SQLiteDatabase db) {
     db.execSQL(Todo.CREATE_TABLE);
-
   }
 
   /**

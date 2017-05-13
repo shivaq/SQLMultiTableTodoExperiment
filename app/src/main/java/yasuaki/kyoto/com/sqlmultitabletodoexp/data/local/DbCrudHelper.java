@@ -24,9 +24,11 @@ public class DbCrudHelper {
   private final BriteDatabase briteDatabase;
   private Todo.Insert_todo insertTodo;
   private Todo.Update_isChecked updateIsChecked;
+  private DbOpenHelper openHelper;
 
   @Inject
   public DbCrudHelper(DbOpenHelper openHelper) {
+    this.openHelper = openHelper;
 
     SqlBrite sqlBrite = new Builder()
         .logger(new Logger() {
@@ -68,6 +70,12 @@ public class DbCrudHelper {
   }
 
   public void updateTodoIsChecked(boolean isChecked, long id){
+
+//    Todo.Update_isChecked updateIsChecked2 = new Update_isChecked(openHelper.getWritableDatabase());
+//    updateIsChecked2.bind(isChecked, id);
+//    updateIsChecked2.program.execute();
+
+
     updateIsChecked.bind(isChecked, id);
     briteDatabase.executeUpdateDelete(updateIsChecked.table, updateIsChecked.program);
   }
