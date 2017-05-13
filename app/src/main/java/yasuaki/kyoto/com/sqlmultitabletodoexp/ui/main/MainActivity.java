@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.widget.Toast;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -91,8 +90,14 @@ public class MainActivity extends BaseActivity implements MainMvpView, RvCallbac
 
   /********************** implement RvCallback **********************/
   @Override
-  public void onRvItemClicked(String s) {
-    Toast.makeText(this, s, Toast.LENGTH_SHORT).show();
+  public void onRvTodoCbClicked(boolean isChecked, long id) {
+    mainPresenter.updateTodoIsChecked(isChecked, id);
+  }
 
+  @Override
+  public void onRvItemClicked(Todo clickedTodo) {
+    Intent intent = new Intent(this, AddEditActivity.class);
+    String todoStr = clickedTodo.todo();
+    long todo_id = clickedTodo._id();
   }
 }

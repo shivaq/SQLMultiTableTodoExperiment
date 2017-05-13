@@ -66,4 +66,8 @@ public class MainPresenter implements BasePresenter<MainMvpView> {
             })
     );
   }
+
+  public void updateTodoIsChecked(boolean isChecked, long id){
+    dataManager.updateTodoIsChecked(isChecked, id);
+  }
 }

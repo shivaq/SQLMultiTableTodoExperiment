@@ -9,6 +9,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
@@ -42,18 +43,27 @@ public class MainRvAdapter extends RecyclerView.Adapter<MainRvViewHolder>{
 
     Todo todo = todoList.get(position);
     String todoItem = todo.todo();
-    holder.txtTodo.setText(todoItem);
+    boolean isTodoChecked = todo.isChecked();
 
+    long todoId = todo._id();
+
+    CheckBox todoCb = holder.cbTodo;
+
+
+    holder.txtTodo.setText(todoItem);
+    todoCb.setChecked(isTodoChecked);
+
+    // API 24 以前にも互換性があるが、相対的にコスト高になるとのこと
     holder.cbTodo.setOnClickListener(view ->{
       if(rvCallback != null){
-        rvCallback.onRvItemClicked(todoItem);
+          rvCallback.onRvTodoCbClicked(!isTodoChecked, todoId);
       }
     });
 //        new OnClickListener() {
 //      @Override
 //      public void onClick(View v) {
 //        if(rvCallback != null){
-//          rvCallback.onRvItemClicked(todoItem);
+//          rvCallback.onRvTodoCbClicked(todoItem);
 //        }
 //      }
 //    });
@@ -73,12 +83,14 @@ public class MainRvAdapter extends RecyclerView.Adapter<MainRvViewHolder>{
 
   /*********************** ClickListener *****************************/
   interface RvCallback{
-    void onRvItemClicked(String s);
+    void onRvTodoCbClicked(boolean isChecked, long id);
+    void onRvItemClicked(Todo clickedTodo);
   }
 
   public void registerRvCallback(RvCallback rvCallback){
     this.rvCallback = rvCallback;
   }
+
 
 
   /**************************************************************/
@@ -96,6 +108,16 @@ public class MainRvAdapter extends RecyclerView.Adapter<MainRvViewHolder>{
     public MainRvViewHolder(View itemView) {
       super(itemView);
       ButterKnife.bind(this, itemView);
+    }
+
+    // CallBack メソッドを、ViewHolder 内のクリックListenerからも呼び出せる
+    @OnClick(R.id.rv_item_todo)
+    void onRvTodoClicked(){
+      int adapterPosition = getAdapterPosition();
+      Todo clickedTodo = todoList.get(adapterPosition);
+      if(rvCallback!=null){
+        rvCallback.onRvItemClicked(clickedTodo);
+      }
     }
   }
 }
