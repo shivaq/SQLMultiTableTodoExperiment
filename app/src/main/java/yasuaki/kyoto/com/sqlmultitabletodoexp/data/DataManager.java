@@ -61,4 +61,8 @@ public class DataManager {
   public void updateTodo(String addedTodo, long todoId) {
     dbCrudHelper.updateTodoString(addedTodo, todoId);
   }
+
+  public int deleteTodo(long todoId) {
+    return dbCrudHelper.deleteTodo(todoId);
+  }
 }

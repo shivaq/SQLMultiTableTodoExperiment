@@ -26,6 +26,10 @@ UPDATE todo
 SET todo = ?
 WHERE _id = ?;
 
+delete_todo:
+DELETE FROM todo
+WHERE _id = ?;
+
 select_by_id:
 SELECT *
 FROM todo

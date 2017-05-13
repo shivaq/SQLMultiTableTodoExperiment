@@ -35,4 +35,10 @@ public class AddEditPresenter implements BasePresenter<AddEditMvpView> {
     Timber.d("AddEditPresenter:updateTodo: updated");
     addEditMvpView.closeActivity();
   }
+
+  public int deleteTodo(long todoId) {
+    int deletedRows = dataManager.deleteTodo(todoId);
+    addEditMvpView.closeActivity();
+    return deletedRows;
+  }
 }

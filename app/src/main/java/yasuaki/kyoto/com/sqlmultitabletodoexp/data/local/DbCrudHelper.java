@@ -14,6 +14,7 @@ import rx.Observable;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import timber.log.Timber;
+import yasuaki.kyoto.com.sqlmultitabletodoexp.TodoModel.Delete_todo;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.TodoModel.Insert_todo;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.TodoModel.Update_isChecked;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.TodoModel.Update_todoString;
@@ -26,6 +27,7 @@ public class DbCrudHelper {
   private Todo.Insert_todo insertTodo;
   private Todo.Update_isChecked updateIsChecked;
   private Todo.Update_todoString updateTodoString;
+  private Todo.Delete_todo deleteTodo;
 
   @Inject
   public DbCrudHelper(DbOpenHelper openHelper) {
@@ -45,6 +47,7 @@ public class DbCrudHelper {
     insertTodo = new Insert_todo(sqLiteWritableDatabase);
     updateIsChecked = new Update_isChecked(sqLiteWritableDatabase);
     updateTodoString = new Update_todoString(sqLiteWritableDatabase);
+    deleteTodo = new Delete_todo(sqLiteWritableDatabase);
   }
 
   public Observable<Cursor> loadTodo() {
@@ -80,5 +83,11 @@ public class DbCrudHelper {
     updateTodoString.bind(addedTodo, todoId);
     int id = briteDatabase.executeUpdateDelete(updateTodoString.table, updateTodoString.program);
     Timber.d("DbCrudHelper:updateTodoString: id is %s", id);
+  }
+
+  public int deleteTodo(long todoId) {
+    deleteTodo.bind(todoId);
+
+    return briteDatabase.executeUpdateDelete(deleteTodo.table, deleteTodo.program);
   }
 }
