@@ -1,12 +1,13 @@
 package yasuaki.kyoto.com.sqlmultitabletodoexp.data.model;
 
+import android.os.Parcelable;
 import com.google.auto.value.AutoValue;
 import com.squareup.sqldelight.RowMapper;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.TodoModel;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.DateAdapter;
 
 @AutoValue
-public abstract class Todo implements TodoModel {
+public abstract class Todo implements TodoModel, Parcelable {
 
   private static final DateAdapter DATE_ADAPTER = new DateAdapter();
 

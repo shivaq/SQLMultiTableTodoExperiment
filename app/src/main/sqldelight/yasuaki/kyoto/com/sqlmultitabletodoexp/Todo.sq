@@ -21,6 +21,11 @@ UPDATE todo
 SET isChecked = ?
 WHERE _id = ?;
 
+update_todoString:
+UPDATE todo
+SET todo = ?
+WHERE _id = ?;
+
 select_by_id:
 SELECT *
 FROM todo

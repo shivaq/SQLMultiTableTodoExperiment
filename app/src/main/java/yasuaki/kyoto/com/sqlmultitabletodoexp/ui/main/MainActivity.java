@@ -110,7 +110,7 @@ public class MainActivity extends BaseActivity implements MainMvpView, RvCallbac
   @Override
   public void onRvItemClicked(Todo clickedTodo) {
     Intent intent = new Intent(this, AddEditActivity.class);
-    String todoStr = clickedTodo.todo();
-    long todo_id = clickedTodo._id();
+    intent.putExtra(AddEditActivity.TODO_EXTRA, clickedTodo);
+    startActivity(intent);
   }
 }

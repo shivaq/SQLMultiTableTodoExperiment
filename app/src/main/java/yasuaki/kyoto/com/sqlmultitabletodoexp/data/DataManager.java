@@ -57,4 +57,8 @@ public class DataManager {
   public void updateTodoIsChecked(boolean isChecked, long id){
     dbCrudHelper.updateTodoIsChecked(isChecked, id);
   }
+
+  public void updateTodo(String addedTodo, long todoId) {
+    dbCrudHelper.updateTodoString(addedTodo, todoId);
+  }
 }

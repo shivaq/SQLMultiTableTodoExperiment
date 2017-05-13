@@ -49,8 +49,10 @@ dependencies {
     compile "com.squareup.picasso:picasso:$rootProject.picassoVersion"
     // sqldelight
     annotationProcessor 'com.google.auto.value:auto-value:1.4.1'
+    // autovalue
     provided 'com.google.auto.value:auto-value:1.4.1'
     provided 'javax.annotation:jsr250-api:1.0'
+    annotationProcessor 'com.ryanharter.auto.value:auto-value-parcel:0.2.5'
     // sqlbright
     compile "com.squareup.sqlbrite:sqlbrite:$rootProject.sqlBriteVersion"
 

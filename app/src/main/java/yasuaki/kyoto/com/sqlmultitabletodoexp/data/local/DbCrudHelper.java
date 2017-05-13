@@ -16,6 +16,7 @@ import rx.schedulers.Schedulers;
 import timber.log.Timber;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.TodoModel.Insert_todo;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.TodoModel.Update_isChecked;
+import yasuaki.kyoto.com.sqlmultitabletodoexp.TodoModel.Update_todoString;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Todo;
 
 @Singleton
@@ -24,11 +25,10 @@ public class DbCrudHelper {
   private final BriteDatabase briteDatabase;
   private Todo.Insert_todo insertTodo;
   private Todo.Update_isChecked updateIsChecked;
-  private DbOpenHelper openHelper;
+  private Todo.Update_todoString updateTodoString;
 
   @Inject
   public DbCrudHelper(DbOpenHelper openHelper) {
-    this.openHelper = openHelper;
 
     SqlBrite sqlBrite = new Builder()
         .logger(new Logger() {
@@ -44,6 +44,7 @@ public class DbCrudHelper {
     // SqlDelight で生成された コンパイル済みSQLステートメントをインスタンス化
     insertTodo = new Insert_todo(sqLiteWritableDatabase);
     updateIsChecked = new Update_isChecked(sqLiteWritableDatabase);
+    updateTodoString = new Update_todoString(sqLiteWritableDatabase);
   }
 
   public Observable<Cursor> loadTodo() {
@@ -71,12 +72,13 @@ public class DbCrudHelper {
 
   public void updateTodoIsChecked(boolean isChecked, long id){
 
-//    Todo.Update_isChecked updateIsChecked2 = new Update_isChecked(openHelper.getWritableDatabase());
-//    updateIsChecked2.bind(isChecked, id);
-//    updateIsChecked2.program.execute();
-
-
     updateIsChecked.bind(isChecked, id);
     briteDatabase.executeUpdateDelete(updateIsChecked.table, updateIsChecked.program);
+  }
+
+  public void updateTodoString(String addedTodo, long todoId) {
+    updateTodoString.bind(addedTodo, todoId);
+    int id = briteDatabase.executeUpdateDelete(updateTodoString.table, updateTodoString.program);
+    Timber.d("DbCrudHelper:updateTodoString: id is %s", id);
   }
 }

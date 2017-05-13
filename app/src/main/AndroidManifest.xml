@@ -17,7 +17,7 @@
       </intent-filter>
     </activity>
     <activity android:name="yasuaki.kyoto.com.sqlmultitabletodoexp.ui.add.AddEditActivity"
-      android:label="TODO 追加"
+      android:label="@string/title_act_add"
       android:windowSoftInputMode="adjustResize"
       />
   </application>
