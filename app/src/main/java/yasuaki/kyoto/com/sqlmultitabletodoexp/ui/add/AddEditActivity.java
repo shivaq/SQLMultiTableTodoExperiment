@@ -4,9 +4,13 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AlertDialog;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.RecyclerView.LayoutManager;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -16,9 +20,11 @@ import android.widget.EditText;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import java.util.List;
 import javax.inject.Inject;
 import timber.log.Timber;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.R;
+import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Tag;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Todo;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.di.ApplicationContext;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.ui.base.BaseActivity;
@@ -32,16 +38,24 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
   @Inject
   AddEditPresenter addEditPresenter;
   @Inject
+  TagRvAdapter tagRvAdapter;
+  @Inject
   @ApplicationContext
   Context context;
 
   @BindView(R.id.editTodo)
   EditText editTodo;
+  @BindView(R.id.editTag)
+  EditText editTag;
+  @BindView(R.id.rv_tag_add_act)
+  RecyclerView rvTag;
 
   private Todo todoFromMain;
   private boolean isEditMode;
   private boolean isDataModified;
   private String fromMainTodoString;
+  private LayoutManager rvLayoutManager;
+  private Parcelable rvLayoutState;
 
   public static final String TODO_EXTRA = "yasuaki.kyoto.com.sqlmultitabletodoexp.TODO_EXTRA";
 
@@ -52,11 +66,11 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
     ButterKnife.bind(this);
     getActivityComponent().inject(this);
     addEditPresenter.onAttachMvpView(this);
+    addEditPresenter.loadTag();
 
     // 入力欄をタッチしたら、isDataModified を true にしているだけ
     editTodo.setOnTouchListener(touchListener);
-
-
+    editTag.setOnTouchListener(touchListener);
 
     // Edit モードか 新規追加モードかをチェック
     Intent intentFromMain = getIntent();
@@ -70,7 +84,20 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
       setTitle(getString(R.string.title_act_edit));
       isEditMode = true;
       setTodo();
+      //todo:TODO に紐付いているタグをチェック状態にする
     }
+
+    rvLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+    rvTag.setLayoutManager(rvLayoutManager);
+    rvTag.setHasFixedSize(true);
+    rvTag.setAdapter(tagRvAdapter);
+
+  }
+
+  @Override
+  protected void onResume() {
+    super.onResume();
+    addEditPresenter.loadTag();
   }
 
   @Override
@@ -87,7 +114,7 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
 
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
-    switch(item.getItemId()){
+    switch (item.getItemId()) {
       case R.id.action_delete:
         showDeleteConfirmationDialog();
         return true;
@@ -120,16 +147,26 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
     return super.onOptionsItemSelected(item);
   }
 
-  private void setTodo(){
+  /**********************************************************/
+  private void setTodo() {
     fromMainTodoString = todoFromMain.todo();
     editTodo.setText(fromMainTodoString);
+    //TODO:get tag from todo obj
   }
 
-  private void deleteTodo(){
+  private void deleteTodo() {
     if (todoFromMain != null) {
       int deletedRows = addEditPresenter.deleteTodo(todoFromMain._id());
       Timber.d("AddEditActivity:deleteTodo: deletedRows is %s", deletedRows);
     }
+  }
+
+  /*********************** Mvp implementation ***********************************/
+
+  @Override
+  public void setTag(List<Tag> tags) {
+    tagRvAdapter.setTagList(tags);
+    rvTag.setAdapter(tagRvAdapter);
   }
 
   /*********************** OnTouchListener **********************/
@@ -209,7 +246,6 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
       return;
     }
 
-
     // Create a click listener to handle the user confirming that changes should be discarded.
     DialogInterface.OnClickListener discardButtonClickListener =
         new DialogInterface.OnClickListener() {
@@ -223,29 +259,35 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
     // Show dialog that there are unsaved changes
     showUnsavedChangesDialog(discardButtonClickListener);
   }
+
   /*********************** mvp implementation **********************/
   @Override
   public void closeActivity() {
     this.finish();
   }
+
   /*********************** onClick ************************/
   @OnClick(R.id.fab_todo_edit_ok)
-  void onOkClicked(){
+  void onOkClicked() {
     String addedTodo = editTodo.getText().toString();
+    String addedTag = editTag.getText().toString();
+    // TODOが未入力ならそのまま閉じる
     if (addedTodo.length() == 0) {
       closeActivity();
       return;
     }
     if (isEditMode) {
-      if (addedTodo.equals(fromMainTodoString)) {
+      // TODO: update tag
+      // 未変更なら挿入無しで閉じる
+      if (addedTodo.equals(fromMainTodoString) && addedTag.length() == 0) {
         closeActivity();
         return;
       }
       long todoId = todoFromMain._id();
-      Timber.d("AddEditActivity:onOkClicked: editMode");
       addEditPresenter.updateTodo(addedTodo, todoId);
+
     } else {
-      addEditPresenter.saveTodo(addedTodo);
+      addEditPresenter.saveTodo(addedTodo, addedTag);
     }
   }
 }

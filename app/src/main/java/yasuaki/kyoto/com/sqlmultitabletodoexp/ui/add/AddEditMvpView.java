@@ -1,5 +1,7 @@
 package yasuaki.kyoto.com.sqlmultitabletodoexp.ui.add;
 
+import java.util.List;
+import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Tag;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.ui.base.BaseMvpView;
 
 /**
@@ -9,4 +11,6 @@ import yasuaki.kyoto.com.sqlmultitabletodoexp.ui.base.BaseMvpView;
 public interface AddEditMvpView extends BaseMvpView{
 
   void closeActivity();
+
+  void setTag(List<Tag> tags);
 }

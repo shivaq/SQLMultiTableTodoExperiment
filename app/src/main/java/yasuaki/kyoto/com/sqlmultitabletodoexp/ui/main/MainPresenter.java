@@ -6,6 +6,7 @@ import rx.Subscriber;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
+import timber.log.Timber;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.DataManager;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Todo;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.di.PerActivity;
@@ -62,6 +63,8 @@ public class MainPresenter implements BasePresenter<MainMvpView> {
               @Override
               public void onNext(List<Todo> todoList) {
                 mainMvpView.setTodo(todoList);
+                // todo:check if loadTodo is invoked twice and correct it to once
+                Timber.d("MainPresenter:onNext: success loading list size is %s", todoList.size());
               }
             })
     );

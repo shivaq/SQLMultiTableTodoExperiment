@@ -35,7 +35,7 @@ public class MainRvAdapter extends RecyclerView.Adapter<MainRvViewHolder>{
   @Override
   public MainRvViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
     View mainRvItemView = LayoutInflater.from(parent.getContext())
-        .inflate(R.layout.rcy_item_main, parent, false);
+        .inflate(R.layout.rcy_todo_list_item, parent, false);
     return new MainRvViewHolder(mainRvItemView);
   }
 

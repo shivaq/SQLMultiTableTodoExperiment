@@ -1,18 +1,26 @@
 package yasuaki.kyoto.com.sqlmultitabletodoexp.ui.add;
 
+import java.util.List;
 import javax.inject.Inject;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
+import rx.subscriptions.CompositeSubscription;
 import timber.log.Timber;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.DataManager;
+import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Tag;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.ui.base.BasePresenter;
 
 public class AddEditPresenter implements BasePresenter<AddEditMvpView> {
 
   private final DataManager dataManager;
   private AddEditMvpView addEditMvpView;
+  private final CompositeSubscription subscription;
 
   @Inject
-  public AddEditPresenter(DataManager dataManager){
+  public AddEditPresenter(DataManager dataManager) {
     this.dataManager = dataManager;
+    subscription = new CompositeSubscription();
   }
 
   @Override
@@ -23,11 +31,18 @@ public class AddEditPresenter implements BasePresenter<AddEditMvpView> {
   @Override
   public void onDetachMvpView() {
     addEditMvpView = null;
+    subscription.unsubscribe();
   }
 
-  public void saveTodo(String todo) {
-    dataManager.insertTodo(todo);
+  public void saveTodo(String todo, String addedTag) {
+    dataManager.insertTodo(todo, addedTag);
     addEditMvpView.closeActivity();
+  }
+
+  public void saveTag(String addedTag) {
+    Timber.d("AddEditPresenter:saveTag: ");
+    dataManager.insertTag(addedTag);
+
   }
 
   public void updateTodo(String addedTodo, long todoId) {
@@ -40,5 +55,30 @@ public class AddEditPresenter implements BasePresenter<AddEditMvpView> {
     int deletedRows = dataManager.deleteTodo(todoId);
     addEditMvpView.closeActivity();
     return deletedRows;
+  }
+
+  public void loadTag() {
+    subscription.add(
+        dataManager.loadTag()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(new Subscriber<List<Tag>>() {
+
+              @Override
+              public void onCompleted() {
+
+              }
+
+              @Override
+              public void onError(Throwable e) {
+
+              }
+
+              @Override
+              public void onNext(List<Tag> tags) {
+                addEditMvpView.setTag(tags);
+              }
+            })
+    );
   }
 }

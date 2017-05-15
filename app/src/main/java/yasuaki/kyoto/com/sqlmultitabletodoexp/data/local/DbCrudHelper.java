@@ -14,10 +14,12 @@ import rx.Observable;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import timber.log.Timber;
+import yasuaki.kyoto.com.sqlmultitabletodoexp.TagModel.Insert_tag;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.TodoModel.Delete_todo;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.TodoModel.Insert_todo;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.TodoModel.Update_isChecked;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.TodoModel.Update_todoString;
+import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Tag;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Todo;
 
 @Singleton
@@ -28,6 +30,8 @@ public class DbCrudHelper {
   private Todo.Update_isChecked updateIsChecked;
   private Todo.Update_todoString updateTodoString;
   private Todo.Delete_todo deleteTodo;
+
+  private Tag.Insert_tag insertTag;
 
   @Inject
   public DbCrudHelper(DbOpenHelper openHelper) {
@@ -48,6 +52,8 @@ public class DbCrudHelper {
     updateIsChecked = new Update_isChecked(sqLiteWritableDatabase);
     updateTodoString = new Update_todoString(sqLiteWritableDatabase);
     deleteTodo = new Delete_todo(sqLiteWritableDatabase);
+
+    insertTag = new Insert_tag(sqLiteWritableDatabase);
   }
 
   public Observable<Cursor> loadTodo() {
@@ -58,7 +64,7 @@ public class DbCrudHelper {
     return briteDatabase.createQuery(
         Todo.TABLE_NAME,
         selectAllQuery.statement,
-        new String[0])
+        selectAllQuery.args)
         .map(new Func1<Query, Cursor>() {
           @Override
           public Cursor call(Query query) {
@@ -67,13 +73,40 @@ public class DbCrudHelper {
         });
   }
 
-  public void insertTodo(String todo) {
-    long now = System.currentTimeMillis();
-    insertTodo.bind(todo, false, now, now);
-    briteDatabase.executeInsert(insertTodo.table, insertTodo.program);
+  public Observable<Cursor> loadTag() {
+    SqlDelightStatement selectAllTagQuery = Tag.TAG_FACTORY.select_all();
+    return briteDatabase.createQuery(
+        Tag.TABLE_NAME, selectAllTagQuery.statement, selectAllTagQuery.args)
+        .map(new Func1<Query, Cursor>() {
+          @Override
+          public Cursor call(Query query) {
+            return query.run();
+          }
+        });
   }
 
-  public void updateTodoIsChecked(boolean isChecked, long id){
+  public long insertTodo(String todo, String addedTag) {
+    long now = System.currentTimeMillis();
+    long tagId;
+    if (addedTag.length() == 0) {
+      tagId = 0;
+    } else {
+      tagId = insertTag(addedTag);
+    }
+    insertTodo.bind(todo, false, now, now, tagId);
+
+    // tag テーブルの方に、複数の TODO を？
+
+    return briteDatabase.executeInsert(insertTodo.table, insertTodo.program);
+  }
+
+  public long insertTag(String addedTag) {
+    long now = System.currentTimeMillis();
+    insertTag.bind(addedTag, false, now, now);
+    return briteDatabase.executeInsert(insertTag.table, insertTag.program);
+  }
+
+  public void updateTodoIsChecked(boolean isChecked, long id) {
 
     updateIsChecked.bind(isChecked, id);
     briteDatabase.executeUpdateDelete(updateIsChecked.table, updateIsChecked.program);
@@ -82,12 +115,10 @@ public class DbCrudHelper {
   public void updateTodoString(String addedTodo, long todoId) {
     updateTodoString.bind(addedTodo, todoId);
     int id = briteDatabase.executeUpdateDelete(updateTodoString.table, updateTodoString.program);
-    Timber.d("DbCrudHelper:updateTodoString: id is %s", id);
   }
 
   public int deleteTodo(long todoId) {
     deleteTodo.bind(todoId);
-
     return briteDatabase.executeUpdateDelete(deleteTodo.table, deleteTodo.program);
   }
 }

@@ -7,7 +7,9 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import rx.Observable;
 import rx.functions.Func1;
+import timber.log.Timber;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.local.DbCrudHelper;
+import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Tag;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Todo;
 
 /**
@@ -29,20 +31,19 @@ public class DataManager {
     return dbCrudHelper.loadTodo()
         // カーソルを、List に変換する
         // map →Observable が emit した各アイテムに、function を適用していく
-        .map(new Func1<Cursor, List<Todo>>(){
+        .map(new Func1<Cursor, List<Todo>>() {
           @Override
           public List<Todo> call(Cursor cursor) {
-
             List<Todo> todoList = new ArrayList<>();
-            try{
+            try {
               if (cursor.moveToFirst()) {
-                for(int i = 0; i < cursor.getCount(); i++){
-                  Todo todo = Todo.MAPPER.map(cursor);
-                  todoList.add(todo);
+                for (int i = 0; i < cursor.getCount(); i++) {
+                  Todo allTodo = Todo.SELECT_ALL_MAPPER.map(cursor);
+                  todoList.add(allTodo);
                   cursor.moveToNext();
                 }
               }
-            }finally{
+            } finally {
               cursor.close();
             }
             return todoList;
@@ -50,11 +51,40 @@ public class DataManager {
         });
   }
 
-  public void insertTodo(String todo) {
-    dbCrudHelper.insertTodo(todo);
+  public Observable<List<Tag>> loadTag() {
+
+    return dbCrudHelper.loadTag()
+        .map(new Func1<Cursor, List<Tag>>(){
+
+          @Override
+          public List<Tag> call(Cursor cursor) {
+            Timber.d("DataManager:call: cursor size is %s", cursor.getCount());
+            List<Tag> tagList = new ArrayList<>();
+            try{
+              if (cursor.moveToFirst()) {
+                for(int i = 0; i < cursor.getCount(); i++){
+                  Tag tag = Tag.TAG_ROW_MAPPER.map(cursor);
+                  tagList.add(tag);
+                  cursor.moveToNext();
+                }
+              }
+            } finally{
+              cursor.close();
+            }
+            return tagList;
+          }
+        });
   }
 
-  public void updateTodoIsChecked(boolean isChecked, long id){
+  public void insertTodo(String todo, String addedTag) {
+    dbCrudHelper.insertTodo(todo, addedTag);
+  }
+
+  public void insertTag(String addedTag) {
+    dbCrudHelper.insertTag(addedTag);
+  }
+
+  public void updateTodoIsChecked(boolean isChecked, long id) {
     dbCrudHelper.updateTodoIsChecked(isChecked, id);
   }
 
@@ -65,4 +95,6 @@ public class DataManager {
   public int deleteTodo(long todoId) {
     return dbCrudHelper.deleteTodo(todoId);
   }
+
+
 }

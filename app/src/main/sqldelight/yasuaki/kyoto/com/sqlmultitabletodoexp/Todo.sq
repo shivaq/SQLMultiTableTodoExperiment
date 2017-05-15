@@ -1,3 +1,4 @@
+import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Tag;
 import java.util.Calendar;
 
 CREATE TABLE todo(
@@ -5,12 +6,14 @@ CREATE TABLE todo(
   todo TEXT NOT NULL,
   registerd_date INTEGER NOT NULL,
   updated_date INTEGER NOT NULL,
-  isChecked INTEGER AS Boolean DEFAULT 0
+  isChecked INTEGER AS Boolean DEFAULT 0,
+  tag INTEGER,
+  FOREIGN KEY (tag) REFERENCES tag(_id)
 );
 
 insert_todo:
-INSERT INTO todo(todo, isChecked, registerd_date, updated_date)
-VALUES(?,?,?,?);
+INSERT INTO todo(todo, isChecked, registerd_date, updated_date, tag)
+VALUES(?,?,?,?,?);
 
 select_all:
 SELECT *
@@ -30,7 +33,8 @@ delete_todo:
 DELETE FROM todo
 WHERE _id = ?;
 
-select_by_id:
+select_tag_for_todo:
 SELECT *
 FROM todo
-WHERE _id = ?;
+JOIN tag ON todo.tag = tag._id
+WHERE todo._id = ?;

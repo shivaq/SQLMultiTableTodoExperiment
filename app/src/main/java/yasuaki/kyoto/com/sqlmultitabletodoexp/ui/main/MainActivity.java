@@ -54,7 +54,7 @@ public class MainActivity extends BaseActivity implements MainMvpView, RvCallbac
     getActivityComponent().inject(this);
 
     mainPresenter.onAttachMvpView(this);
-    mainPresenter.loadTodo();
+//    mainPresenter.loadTodo();
 
     rvLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL,
         false);

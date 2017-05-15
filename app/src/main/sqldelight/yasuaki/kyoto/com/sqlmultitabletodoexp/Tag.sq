@@ -1,0 +1,25 @@
+CREATE TABLE tag(
+  _id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  tag TEXT NOT NULL,
+  registerd_date INTEGER NOT NULL,
+  updated_date INTEGER NOT NULL,
+  isSelected INTEGER AS Boolean DEFAULT 0
+);
+
+insert_tag:
+INSERT INTO tag(tag, isSelected, registerd_date, updated_date)
+VALUES(?,?,?,?);
+
+select_all:
+SELECT *
+FROM tag
+ORDER BY tag ASC;
+
+delete_tag:
+DELETE FROM tag
+WHERE _id = ?;
+
+update_tag:
+UPDATE tag
+SET tag = ?
+WHERE _id;

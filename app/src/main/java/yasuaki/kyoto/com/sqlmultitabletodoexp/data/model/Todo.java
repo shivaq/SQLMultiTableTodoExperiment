@@ -14,5 +14,15 @@ public abstract class Todo implements TodoModel, Parcelable {
   // SQL の INSERT ステートメントに対応する
   public static final Factory<Todo> TODO_FACTORY = new Factory<>(AutoValue_Todo::new);
 
-  public static final RowMapper<Todo> MAPPER = TODO_FACTORY.select_allMapper();
+  // RowMapper →select結果をオブジェクトにして返却
+  public static final RowMapper<Todo> SELECT_ALL_MAPPER =
+      TODO_FACTORY.select_allMapper();
+
+  public static final RowMapper<SelectTagForTodo> SELECT_BY_TAG_MAPPER =
+      TODO_FACTORY.select_tag_for_todoMapper((AutoValue_Todo_SelectTagForTodo::new), Tag.TAG_FACTORY);
+
+  @AutoValue
+  public static abstract class SelectTagForTodo implements Select_tag_for_todoModel<Todo, Tag>{
+
+  }
 }
