@@ -14,4 +14,6 @@ public abstract class Tag implements TagModel, Parcelable{
   // RowMapper →select結果をオブジェクトにして返却
   public static final RowMapper<Tag> TAG_ROW_MAPPER = TAG_FACTORY.select_allMapper();
 
+  public static final RowMapper<Tag> TAG_BY_ID_ROW_MAPPER = TAG_FACTORY.select_tag_by_idMapper();
+
 }

@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Parcelable;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NavUtils;
 import android.support.v7.app.AlertDialog;
@@ -55,7 +54,7 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
   private boolean isDataModified;
   private String fromMainTodoString;
   private LayoutManager rvLayoutManager;
-  private Parcelable rvLayoutState;
+  private long listSizeBeforeEdit;
 
   public static final String TODO_EXTRA = "yasuaki.kyoto.com.sqlmultitabletodoexp.TODO_EXTRA";
 
@@ -80,11 +79,19 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
       isEditMode = false;
       // menu を無効化
       invalidateOptionsMenu();
+      Timber.d("AddEditActivity:onCreate: ");
+
+
+
+
     } else {
       setTitle(getString(R.string.title_act_edit));
       isEditMode = true;
-      setTodo();
-      //todo:TODO に紐付いているタグをチェック状態にする
+
+      long todoId = todoFromMain._id();
+      // TodoId と紐付いたタグを取得する
+      Timber.d("AddEditActivity:onCreate: todoId is %s", todoId);
+      addEditPresenter.loadTodoTag(todoId);
     }
 
     rvLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
@@ -97,6 +104,7 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
   @Override
   protected void onResume() {
     super.onResume();
+    Timber.d("AddEditActivity:onResume: ");
     addEditPresenter.loadTag();
   }
 
@@ -148,11 +156,7 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
   }
 
   /**********************************************************/
-  private void setTodo() {
-    fromMainTodoString = todoFromMain.todo();
-    editTodo.setText(fromMainTodoString);
-    //TODO:get tag from todo obj
-  }
+
 
   private void deleteTodo() {
     if (todoFromMain != null) {
@@ -164,11 +168,25 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
   /*********************** Mvp implementation ***********************************/
 
   @Override
-  public void setTag(List<Tag> tags) {
-    tagRvAdapter.setTagList(tags);
+  public void setTag(List<Tag> tagList) {
+    tagRvAdapter.setTagList(tagList);
     rvTag.setAdapter(tagRvAdapter);
+    Timber.d("AddEditActivity:setTag: set tagList to adapter");
   }
 
+  @Override
+  public void setTodo(List<Long> checkedTagIdList) {
+    // Todoに紐付いたタグを取得してきてここに至る
+    fromMainTodoString = todoFromMain.todo();
+
+    // Todoに紐付いたタグをAdapter に渡す
+    tagRvAdapter.setCheckedTagList(checkedTagIdList);
+    Timber.d("AddEditActivity:setTodo: set checkedTagList to adapter list size is %s", checkedTagIdList.size());
+
+
+
+    editTodo.setText(fromMainTodoString);
+  }
   /*********************** OnTouchListener **********************/
 
   private View.OnTouchListener touchListener = new OnTouchListener() {
@@ -271,6 +289,8 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
   void onOkClicked() {
     String addedTodo = editTodo.getText().toString();
     String addedTag = editTag.getText().toString();
+    List<Long> checkedTagList = tagRvAdapter.getCheckedTag();
+
     // TODOが未入力ならそのまま閉じる
     if (addedTodo.length() == 0) {
       closeActivity();
@@ -279,15 +299,23 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
     if (isEditMode) {
       // TODO: update tag
       // 未変更なら挿入無しで閉じる
-      if (addedTodo.equals(fromMainTodoString) && addedTag.length() == 0) {
+      if (addedTodo.equals(fromMainTodoString) && addedTag.length() == 0 && checkedTagList.size() == listSizeBeforeEdit) {
         closeActivity();
         return;
       }
       long todoId = todoFromMain._id();
+
+
+
+//      checkedTagList で TodoTag も更新する
+
+
+
       addEditPresenter.updateTodo(addedTodo, todoId);
 
     } else {
-      addEditPresenter.saveTodo(addedTodo, addedTag);
+      Timber.d("AddEditActivity:onOkClicked: ");
+      addEditPresenter.saveTodo(addedTodo, addedTag, checkedTagList);
     }
   }
 }

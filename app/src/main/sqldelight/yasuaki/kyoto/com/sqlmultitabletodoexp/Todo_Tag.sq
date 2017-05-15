@@ -1,0 +1,22 @@
+CREATE TABLE todo_tag (
+  _id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  todo_id INTEGER NOT NULL REFERENCES todo(_id),
+  tag_id INTEGER NOT NULL REFERENCES tag(_id)
+);
+
+insert_todo_tag:
+INSERT INTO todo_tag(todo_id, tag_id)
+VALUES(?,?);
+
+select_tags_for_todoid:
+SELECT *
+FROM todo_tag
+WHERE todo_id = ?;
+
+delete_todo_with_tag:
+DELETE FROM todo_tag
+WHERE todo_id = ? AND tag_id = ?;
+
+delete_todo_by_todo_id:
+DELETE FROM todo_tag
+WHERE todo_id =?;

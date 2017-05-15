@@ -13,6 +13,7 @@ import butterknife.ButterKnife;
 import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
+import timber.log.Timber;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.R;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Tag;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.ui.add.TagRvAdapter.TagRvViewHolder;
@@ -21,10 +22,12 @@ import yasuaki.kyoto.com.sqlmultitabletodoexp.ui.add.TagRvAdapter.TagRvViewHolde
 public class TagRvAdapter extends RecyclerView.Adapter<TagRvViewHolder> {
 
   private static List<Tag> tagList;
+  private static List<Long> checkedTagList;
 
   @Inject
-  TagRvAdapter(){
+  TagRvAdapter() {
     tagList = new ArrayList<>();
+    checkedTagList = new ArrayList<>();
   }
 
   @Override
@@ -40,16 +43,37 @@ public class TagRvAdapter extends RecyclerView.Adapter<TagRvViewHolder> {
     Tag tag = tagList.get(position);
     String tagStr = tag.tag();
     long tagId = tag._id();
-    // TODO:選択有無は、TAG OBJ ではなく TODO OBJ の属性ではないか？
-    boolean isTagSelected = tag.isSelected();
 
     CheckBox tagCB = holder.tagCB;
     holder.tagTv.setText(tagStr);
-    tagCB.setChecked(isTagSelected);
+
+    if (checkedTagList.contains(tagId)) {
+      for(long checkedTag: checkedTagList){
+        Timber.d("TagRvAdapter:onBindViewHolder: checkedTag is %s, tagId is %s", checkedTag, tagId);
+      }
+    }
+
+    if (checkedTagList.size() != 0 && checkedTagList.contains(tagId)) {
+      Timber.d("TagRvAdapter:onBindViewHolder: ");
+      tagCB.setChecked(true);
+    }
+
+    // todo OBJ ロード時に、紐付いているタグ情報を渡す
+    // そのタグのIDと、現在のRvItem のタグ のID とが一致したら、チェック状態にする
+
+
 
     tagCB.setOnCheckedChangeListener(new OnCheckedChangeListener() {
       @Override
       public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+        if (isChecked) {
+          checkedTagList.add(tagId);
+          Timber.d("TagRvAdapter:onCheckedChanged: remove isChecked is %s list size is %s", isChecked, checkedTagList.size());
+        } else {
+          checkedTagList.remove(tagId);
+          Timber.d("TagRvAdapter:onCheckedChanged: add isChecked is %s  list size is %s", isChecked, checkedTagList.size());
+
+        }
       }
     });
 
@@ -65,13 +89,24 @@ public class TagRvAdapter extends RecyclerView.Adapter<TagRvViewHolder> {
   public int getItemCount() {
     return tagList.size();
   }
+
   /**************************************************************/
-  public void setTagList(List<Tag> tagList){
+  public void setTagList(List<Tag> tagList) {
     this.tagList = tagList;
   }
 
+  public void setCheckedTagList(List<Long> checkedTagList) {
+    Timber.d("TagRvAdapter:setCheckedTagList: checkedTagList size is %s", checkedTagList.size());
+    this.checkedTagList = checkedTagList;
+  }
+
+  public List<Long> getCheckedTag() {
+    Timber.d("TagRvAdapter:getCheckedTag: checkedTagList size is %s", checkedTagList.size());
+    return checkedTagList;
+  }
+
   /**************************************************************/
-  class TagRvViewHolder extends RecyclerView.ViewHolder{
+  class TagRvViewHolder extends RecyclerView.ViewHolder {
 
     @BindView(R.id.cb_tag)
     CheckBox tagCB;

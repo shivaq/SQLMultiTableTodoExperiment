@@ -11,6 +11,7 @@ import timber.log.Timber;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.local.DbCrudHelper;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Tag;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Todo;
+import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.TodoTag;
 
 /**
  * リモート、ローカル、プレファレンス、Service と、
@@ -52,23 +53,23 @@ public class DataManager {
   }
 
   public Observable<List<Tag>> loadTag() {
-
+    Timber.d("DataManager:loadTag: ");
     return dbCrudHelper.loadTag()
-        .map(new Func1<Cursor, List<Tag>>(){
+        .map(new Func1<Cursor, List<Tag>>() {
 
           @Override
           public List<Tag> call(Cursor cursor) {
             Timber.d("DataManager:call: cursor size is %s", cursor.getCount());
             List<Tag> tagList = new ArrayList<>();
-            try{
+            try {
               if (cursor.moveToFirst()) {
-                for(int i = 0; i < cursor.getCount(); i++){
+                for (int i = 0; i < cursor.getCount(); i++) {
                   Tag tag = Tag.TAG_ROW_MAPPER.map(cursor);
                   tagList.add(tag);
                   cursor.moveToNext();
                 }
               }
-            } finally{
+            } finally {
               cursor.close();
             }
             return tagList;
@@ -76,8 +77,33 @@ public class DataManager {
         });
   }
 
-  public void insertTodo(String todo, String addedTag) {
-    dbCrudHelper.insertTodo(todo, addedTag);
+  public Observable<List<Long>> loadTodoTag(long todoId) {
+    return dbCrudHelper.loadTodoTag(todoId)
+        .map(new Func1<Cursor, List<Long>>() {
+
+          @Override
+          public List<Long> call(Cursor cursor) {
+            List<Long> tagList = new ArrayList();
+            try {
+              if (cursor.moveToFirst()) {
+                for (int i = 0; i < cursor.getCount(); i++) {
+                  TodoTag todoTag = TodoTag.TAG_FOR_TODO_ROW_MAPPER.map(cursor);
+                  tagList.add(todoTag.tag_id());
+
+                  cursor.moveToNext();
+                }
+              }
+            } finally {
+              cursor.close();
+            }
+            return tagList;
+          }
+        });
+  }
+
+  public void insertTodo(String todo, String addedTag, List<Long> checkedTagList) {
+    Timber.d("DataManager:insertTodo: ");
+    dbCrudHelper.insertTodo(todo, addedTag, checkedTagList);
   }
 
   public void insertTag(String addedTag) {

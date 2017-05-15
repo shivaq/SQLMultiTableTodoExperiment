@@ -1,14 +1,12 @@
 CREATE TABLE tag(
   _id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   tag TEXT NOT NULL,
-  registerd_date INTEGER NOT NULL,
-  updated_date INTEGER NOT NULL,
-  isSelected INTEGER AS Boolean DEFAULT 0
+  registerd_date INTEGER NOT NULL
 );
 
 insert_tag:
-INSERT INTO tag(tag, isSelected, registerd_date, updated_date)
-VALUES(?,?,?,?);
+INSERT INTO tag(tag, registerd_date)
+VALUES(?,?);
 
 select_all:
 SELECT *
@@ -23,3 +21,8 @@ update_tag:
 UPDATE tag
 SET tag = ?
 WHERE _id;
+
+select_tag_by_id:
+SELECT *
+FROM tag
+WHERE _id = ?;

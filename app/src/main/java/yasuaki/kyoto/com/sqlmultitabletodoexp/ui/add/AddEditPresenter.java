@@ -34,8 +34,8 @@ public class AddEditPresenter implements BasePresenter<AddEditMvpView> {
     subscription.unsubscribe();
   }
 
-  public void saveTodo(String todo, String addedTag) {
-    dataManager.insertTodo(todo, addedTag);
+  public void saveTodo(String todo, String addedTag, List<Long> checkedTagList) {
+    dataManager.insertTodo(todo, addedTag, checkedTagList);
     addEditMvpView.closeActivity();
   }
 
@@ -58,6 +58,7 @@ public class AddEditPresenter implements BasePresenter<AddEditMvpView> {
   }
 
   public void loadTag() {
+    Timber.d("AddEditPresenter:loadTag: ");
     subscription.add(
         dataManager.loadTag()
             .subscribeOn(Schedulers.io())
@@ -77,6 +78,31 @@ public class AddEditPresenter implements BasePresenter<AddEditMvpView> {
               @Override
               public void onNext(List<Tag> tags) {
                 addEditMvpView.setTag(tags);
+              }
+            })
+    );
+  }
+
+  public void loadTodoTag(long todoId) {
+    subscription.add(
+        dataManager.loadTodoTag(todoId)
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe(new Subscriber<List<Long>>() {
+
+              @Override
+              public void onCompleted() {
+
+              }
+
+              @Override
+              public void onError(Throwable e) {
+
+              }
+
+              @Override
+              public void onNext(List<Long> tagList) {
+                addEditMvpView.setTodo(tagList);
               }
             })
     );
