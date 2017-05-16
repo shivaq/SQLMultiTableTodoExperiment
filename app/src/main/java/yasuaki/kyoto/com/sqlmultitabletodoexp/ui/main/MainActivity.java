@@ -20,6 +20,7 @@ import yasuaki.kyoto.com.sqlmultitabletodoexp.di.component.ActivityComponent;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.ui.add.AddEditActivity;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.ui.base.BaseActivity;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.ui.main.MainRvAdapter.RvCallback;
+import yasuaki.kyoto.com.sqlmultitabletodoexp.ui.tagedit.TagListActivity;
 
 public class MainActivity extends BaseActivity implements MainMvpView, RvCallback {
 
@@ -111,6 +112,12 @@ public class MainActivity extends BaseActivity implements MainMvpView, RvCallbac
   public void onRvItemClicked(Todo clickedTodo) {
     Intent intent = new Intent(this, AddEditActivity.class);
     intent.putExtra(AddEditActivity.TODO_EXTRA, clickedTodo);
+    startActivity(intent);
+  }
+
+  @OnClick(R.id.tv_link_tag_list)
+  public void onTagListLinkClicked() {
+    Intent intent = new Intent(this, TagListActivity.class);
     startActivity(intent);
   }
 }

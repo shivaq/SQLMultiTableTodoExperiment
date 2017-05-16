@@ -16,17 +16,17 @@ import javax.inject.Inject;
 import timber.log.Timber;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.R;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Tag;
-import yasuaki.kyoto.com.sqlmultitabletodoexp.ui.add.TagRvAdapter.TagRvViewHolder;
+import yasuaki.kyoto.com.sqlmultitabletodoexp.ui.add.RvAdapterForTodoTag.TagRvViewHolder;
 
 
-public class TagRvAdapter extends RecyclerView.Adapter<TagRvViewHolder> {
+public class RvAdapterForTodoTag extends RecyclerView.Adapter<TagRvViewHolder> {
 
   private static List<Tag> plainTagList;
   private static List<Long> checkedTagIdList;
   private static boolean isCBModified;
 
   @Inject
-  TagRvAdapter() {
+  RvAdapterForTodoTag() {
     plainTagList = new ArrayList<>();
     checkedTagIdList = new ArrayList<>();
   }
@@ -74,12 +74,12 @@ public class TagRvAdapter extends RecyclerView.Adapter<TagRvViewHolder> {
 
   /**************************************************************/
   public void setPlainTagList(List<Tag> tagList) {
-    this.plainTagList = tagList;
+    RvAdapterForTodoTag.plainTagList = tagList;
   }
 
   public void setCheckedTagList(List<Long> checkedTagIdList) {
-    this.checkedTagIdList = checkedTagIdList;
-    Timber.d("TagRvAdapter:setCheckedTagList: TagId");
+    RvAdapterForTodoTag.checkedTagIdList = checkedTagIdList;
+    Timber.d("RvAdapterForTodoTag:setCheckedTagList: TagId");
   }
 
 

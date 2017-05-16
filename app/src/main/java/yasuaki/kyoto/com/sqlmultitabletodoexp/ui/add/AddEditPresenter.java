@@ -39,12 +39,6 @@ public class AddEditPresenter implements BasePresenter<AddEditMvpView> {
     addEditMvpView.closeActivity();
   }
 
-  public void saveTag(String addedTag) {
-    Timber.d("AddEditPresenter:saveTag: ");
-    dataManager.insertTag(addedTag);
-
-  }
-
   public void updateTodo(String addedTodo, String addedTagStr, long todoId,
       List<Long> checkedTagIdList) {
     dataManager.updateTodo(addedTodo, addedTagStr, todoId, checkedTagIdList);
@@ -58,6 +52,7 @@ public class AddEditPresenter implements BasePresenter<AddEditMvpView> {
     return deletedRows;
   }
 
+  /********************************** load ************************************/
   public void loadPlainTag() {
     Timber.d("AddEditPresenter:loadPlainTag: ");
     subscription.add(

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:id="@+id/container_edit_tag"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:orientation="horizontal">
+
+  <TextView
+    android:id="@+id/tv_tag_name"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_weight="1"
+    android:layout_margin="4dp"
+    tools:text="てめえらの血の色を尋ねる"/>
+  <TextView
+    android:id="@+id/tv_tag_used_count"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp"
+    tools:text="999"/>
+</LinearLayout>

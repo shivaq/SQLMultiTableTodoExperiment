@@ -1,6 +1,5 @@
 package yasuaki.kyoto.com.sqlmultitabletodoexp.ui.add;
 
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -26,7 +25,6 @@ import timber.log.Timber;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.R;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Tag;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Todo;
-import yasuaki.kyoto.com.sqlmultitabletodoexp.di.ApplicationContext;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.ui.base.BaseActivity;
 
 /**
@@ -38,10 +36,10 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
   @Inject
   AddEditPresenter addEditPresenter;
   @Inject
-  TagRvAdapter tagRvAdapter;
-  @Inject
-  @ApplicationContext
-  Context context;
+  RvAdapterForTodoTag rvAdapterForTodoTag;
+//  @Inject
+//  @ApplicationContext
+//  Context context;
 
   @BindView(R.id.editTodo)
   EditText editTodo;
@@ -56,8 +54,6 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
   private String fromMainTodoString;
   private LayoutManager rvLayoutManager;
   private List<Tag> plainTagList;
-//  private int listSizeBeforeEdit;
-//  private static List<Long> checkedTagIdListBeforeEdit;
 
   public static final String TODO_EXTRA = "yasuaki.kyoto.com.sqlmultitabletodoexp.TODO_EXTRA";
 
@@ -96,8 +92,7 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
     rvLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
     rvTag.setLayoutManager(rvLayoutManager);
     rvTag.setHasFixedSize(true);
-    rvTag.setAdapter(tagRvAdapter);
-
+    rvTag.setAdapter(rvAdapterForTodoTag);
   }
 
   @Override
@@ -165,12 +160,16 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
   }
 
   /*********************** Mvp implementation ***********************************/
+  @Override
+  public void closeActivity() {
+    this.finish();
+  }
 
   @Override
   public void setPlainTagList(List<Tag> plainTagList) {
     this.plainTagList = plainTagList;
-    tagRvAdapter.setPlainTagList(plainTagList);
-    rvTag.setAdapter(tagRvAdapter);
+    rvAdapterForTodoTag.setPlainTagList(plainTagList);
+    rvTag.setAdapter(rvAdapterForTodoTag);
   }
 
   @Override
@@ -181,7 +180,7 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
 //    checkedTagIdListBeforeEdit = checkedTagIdList;
 //    Timber.d("AddEditActivity:setTodoWithCheckedTag: checkedTagIdListBeforeEdit is %s", checkedTagIdListBeforeEdit);
     // Todoに紐付いたタグをAdapter に渡す
-    tagRvAdapter.setCheckedTagList(checkedTagIdList);
+    rvAdapterForTodoTag.setCheckedTagList(checkedTagIdList);
     editTodo.setText(fromMainTodoString);
   }
 
@@ -275,11 +274,6 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
     showUnsavedChangesDialog(discardButtonClickListener);
   }
 
-  /*********************** mvp implementation **********************/
-  @Override
-  public void closeActivity() {
-    this.finish();
-  }
 
   /*********************** onClick ************************/
   @OnClick(R.id.fab_todo_edit_ok)
@@ -287,7 +281,7 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
     String addedTodoStr = editTodo.getText().toString();
     String addedTagStr = editTag.getText().toString();
 
-    List<Long> checkedTagIdList = tagRvAdapter.getCheckedTagIdList();
+    List<Long> checkedTagIdList = rvAdapterForTodoTag.getCheckedTagIdList();
     boolean cbIsModified = false;
 
     // TODOが未入力かどうか

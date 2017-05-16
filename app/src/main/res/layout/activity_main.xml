@@ -8,37 +8,64 @@
   tools:context=".ui.main.MainActivity">
 
 
-    <android.support.v7.widget.RecyclerView
-      android:id="@+id/recycler_subject"
-      android:layout_width="0dp"
-      android:layout_height="0dp"
-      android:layout_marginTop="8dp"
-      android:layout_marginBottom="8dp"
-      android:layout_marginLeft="0dp"
-      android:layout_marginRight="0dp"
-      app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintHorizontal_bias="0.0"
-      app:layout_constraintLeft_toLeftOf="parent"
-      app:layout_constraintRight_toRightOf="parent"
-      app:layout_constraintTop_toTopOf="parent"
-      app:layout_constraintVertical_bias="1.0"/>
-    <android.support.design.widget.FloatingActionButton
-      android:id="@+id/fab_add_todo"
+  <android.support.v7.widget.RecyclerView
+    android:id="@+id/recycler_subject"
+    android:layout_width="0dp"
+    android:layout_height="0dp"
+    android:layout_marginTop="8dp"
+    android:layout_marginBottom="8dp"
+    app:layout_constraintBottom_toTopOf="@+id/container_link_footer"
+    app:layout_constraintHorizontal_bias="0.0"
+    app:layout_constraintLeft_toLeftOf="parent"
+    app:layout_constraintRight_toRightOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintVertical_bias="1.0"
+    tools:layout_constraintBottom_creator="1"
+    tools:layout_constraintLeft_creator="1"
+    tools:layout_constraintRight_creator="1"
+    tools:layout_constraintTop_creator="1"/>
+
+  <LinearLayout
+    android:id="@+id/container_link_footer"
+    android:layout_width="0dp"
+    android:layout_height="wrap_content"
+    android:background="@color/pink_300"
+    android:gravity="center"
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintLeft_toLeftOf="@+id/recycler_subject"
+    app:layout_constraintRight_toRightOf="parent"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintVertical_bias="1.0"
+    tools:layout_constraintBottom_creator="1"
+    tools:layout_constraintLeft_creator="1"
+    tools:layout_constraintTop_creator="1">
+    <TextView
+      android:id="@+id/tv_link_tag_list"
       android:layout_width="wrap_content"
       android:layout_height="wrap_content"
       android:layout_margin="8dp"
-      android:layout_marginTop="8dp"
-      android:layout_marginBottom="8dp"
-      android:layout_marginLeft="8dp"
-      android:layout_marginRight="8dp"
-      app:fabSize="normal"
-      app:layout_anchor="@id/recycler_subject"
-      app:layout_anchorGravity="bottom|right|end"
-      app:layout_constraintBottom_toBottomOf="@+id/recycler_subject"
-      app:layout_constraintHorizontal_bias="1.0"
-      app:layout_constraintLeft_toLeftOf="@+id/recycler_subject"
-      app:layout_constraintRight_toRightOf="@+id/recycler_subject"
-      app:layout_constraintTop_toTopOf="@+id/recycler_subject"
-      app:layout_constraintVertical_bias="1.0"
-      app:srcCompat="@drawable/ic_add"/>
+      android:text="TagListView(Link)"
+      android:textColor="@color/grey"/>
+  </LinearLayout>
+  <android.support.design.widget.FloatingActionButton
+    android:id="@+id/fab_add_todo"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    android:layout_marginTop="8dp"
+    android:layout_marginBottom="8dp"
+    android:layout_marginStart="8dp"
+    android:layout_marginEnd="8dp"
+    android:layout_marginLeft="8dp"
+    android:layout_marginRight="8dp"
+    app:fabSize="normal"
+    app:layout_anchor="@id/recycler_subject"
+    app:layout_anchorGravity="bottom|right|end"
+    app:layout_constraintBottom_toBottomOf="@+id/recycler_subject"
+    app:layout_constraintHorizontal_bias="1.0"
+    app:layout_constraintLeft_toLeftOf="@+id/recycler_subject"
+    app:layout_constraintRight_toRightOf="@+id/recycler_subject"
+    app:layout_constraintTop_toTopOf="@+id/recycler_subject"
+    app:layout_constraintVertical_bias="1.0"
+    app:srcCompat="@drawable/ic_add"/>
 </android.support.constraint.ConstraintLayout>
