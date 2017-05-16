@@ -23,6 +23,7 @@ import java.util.List;
 import javax.inject.Inject;
 import timber.log.Timber;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.R;
+import yasuaki.kyoto.com.sqlmultitabletodoexp.RvItemDecorator;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Tag;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Todo;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.ui.base.BaseActivity;
@@ -92,6 +93,7 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
     rvLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
     rvTag.setLayoutManager(rvLayoutManager);
     rvTag.setHasFixedSize(true);
+    rvTag.addItemDecoration(new RvItemDecorator(this));
     rvTag.setAdapter(rvAdapterForTodoTag);
   }
 
@@ -320,4 +322,5 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
       addEditPresenter.saveTodo(addedTodoStr, addedTagStr, checkedTagIdList);
     }
   }
+
 }

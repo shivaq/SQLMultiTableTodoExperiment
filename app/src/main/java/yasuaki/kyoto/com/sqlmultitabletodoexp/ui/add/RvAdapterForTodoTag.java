@@ -3,10 +3,12 @@ package yasuaki.kyoto.com.sqlmultitabletodoexp.ui.add;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -48,10 +50,11 @@ public class RvAdapterForTodoTag extends RecyclerView.Adapter<TagRvViewHolder> {
     CheckBox tagCB = holder.tagCB;
     holder.tagTv.setText(plainTagStr);
 
-    if (checkedTagIdList.contains(plainTagId)) {
+    if (checkedTagIdList != null && checkedTagIdList.contains(plainTagId)) {
       tagCB.setChecked(true);
     }
 
+    // Listener for CheckBox
     tagCB.setOnCheckedChangeListener(new OnCheckedChangeListener() {
       @Override
       public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -64,7 +67,21 @@ public class RvAdapterForTodoTag extends RecyclerView.Adapter<TagRvViewHolder> {
         }
       }
     });
-
+    // Listener for RvItem CheckBox にセットしていないと、クリック後の処理がなされない
+    holder.rvItemContainer.setOnClickListener(new OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        if (tagCB.isChecked()) {
+          checkedTagIdList.remove(plainTagId);
+          isCBModified = true;
+          tagCB.setChecked(false);
+        } else {
+          checkedTagIdList.add(plainTagId);
+          isCBModified = true;
+          tagCB.setChecked(true);
+        }
+      }
+    });
   }
 
   @Override
@@ -82,7 +99,6 @@ public class RvAdapterForTodoTag extends RecyclerView.Adapter<TagRvViewHolder> {
     Timber.d("RvAdapterForTodoTag:setCheckedTagList: TagId");
   }
 
-
   public List<Long> getCheckedTagIdList() {
     if (!isCBModified) {
       checkedTagIdList = null;
@@ -90,14 +106,14 @@ public class RvAdapterForTodoTag extends RecyclerView.Adapter<TagRvViewHolder> {
     return checkedTagIdList;
   }
 
-
   /**************************************************************/
   class TagRvViewHolder extends RecyclerView.ViewHolder {
-
     @BindView(R.id.cb_tag)
     CheckBox tagCB;
     @BindView(R.id.tag_name)
     TextView tagTv;
+    @BindView(R.id.container_rv_item_todo_tag)
+    LinearLayout rvItemContainer;
 
     public TagRvViewHolder(View itemView) {
       super(itemView);

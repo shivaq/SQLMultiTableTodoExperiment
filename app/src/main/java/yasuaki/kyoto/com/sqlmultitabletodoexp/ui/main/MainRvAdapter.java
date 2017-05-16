@@ -145,8 +145,9 @@ public class MainRvAdapter extends RecyclerView.Adapter<MainRvViewHolder>{
       ButterKnife.bind(this, itemView);
     }
 
+    /********************* OnClick **********************************************/
     // CallBack メソッドを、ViewHolder 内のクリックListenerからも呼び出せる
-    @OnClick(R.id.rv_item_todo)
+    @OnClick(R.id.container_rv_item_todo)
     void onRvTodoClicked(){
       int adapterPosition = getAdapterPosition();
       Todo clickedTodo = todoList.get(adapterPosition);

@@ -14,6 +14,7 @@ import java.util.List;
 import javax.inject.Inject;
 import timber.log.Timber;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.R;
+import yasuaki.kyoto.com.sqlmultitabletodoexp.RvItemDecorator;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Todo;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.di.ApplicationContext;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.di.component.ActivityComponent;
@@ -61,6 +62,7 @@ public class MainActivity extends BaseActivity implements MainMvpView, RvCallbac
         false);
     rvMain.setLayoutManager(rvLayoutManager);
     rvMain.setHasFixedSize(true);
+    rvMain.addItemDecoration(new RvItemDecorator(this));
     rvMain.setAdapter(mainRvAdapter);
     mainRvAdapter.registerRvCallback(this);
     Timber.d("MainActivity:onCreate: ");
@@ -85,6 +87,13 @@ public class MainActivity extends BaseActivity implements MainMvpView, RvCallbac
     // load したリストを Rv の Adapter にセットし、
     // その Adapter を Rv に再セットすることで、load した結果がスクリーンに反映される
     rvMain.setAdapter(mainRvAdapter);
+  }
+
+  /********************* OnClick **********************************************/
+  @OnClick(R.id.tv_link_tag_list)
+  public void onTagListLinkClicked() {
+    Intent intent = new Intent(this, TagListActivity.class);
+    startActivity(intent);
   }
 
   @OnClick(R.id.fab_add_todo)
@@ -115,9 +124,4 @@ public class MainActivity extends BaseActivity implements MainMvpView, RvCallbac
     startActivity(intent);
   }
 
-  @OnClick(R.id.tv_link_tag_list)
-  public void onTagListLinkClicked() {
-    Intent intent = new Intent(this, TagListActivity.class);
-    startActivity(intent);
-  }
 }

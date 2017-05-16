@@ -9,6 +9,7 @@ import butterknife.ButterKnife;
 import java.util.List;
 import javax.inject.Inject;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.R;
+import yasuaki.kyoto.com.sqlmultitabletodoexp.RvItemDecorator;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Tag;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.ui.base.BaseActivity;
 
@@ -37,6 +38,7 @@ public class TagListActivity  extends BaseActivity implements TagListMvpView{
     rvLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
     rvEditTag.setLayoutManager(rvLayoutManager);
     rvEditTag.setHasFixedSize(true);
+    rvEditTag.addItemDecoration(new RvItemDecorator(this));
     rvEditTag.setAdapter(rvAdapterForTagList);
   }
 

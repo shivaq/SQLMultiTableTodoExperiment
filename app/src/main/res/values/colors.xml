@@ -119,4 +119,7 @@
     <color name="sumire">@color/deep_purple_30a</color>
     <color name="pink_purple">@color/pink_90b</color>
 
+
+
+    <color name="ripple_color">@color/pink_300</color>
 </resources>
