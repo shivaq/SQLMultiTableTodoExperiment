@@ -157,9 +157,15 @@ public class DbCrudHelper {
     if (addedTagStr.length() != 0) {
       // タグテーブルにInsert
       long newTagId = insertTag(addedTagStr);
-      // TodoTag テーブルにも挿入
-      insertTodoTag.bind(todoId, newTagId);
-      long todoTagId = briteDatabase.executeInsert(insertTodoTag.table, insertTodoTag.program);
+
+      if(checkedTagIdList != null){
+        // todoTag の再挿入時に追加させる
+        checkedTagIdList.add(newTagId);
+      } else{
+        // TodoTag テーブルに挿入
+        insertTodoTag.bind(todoId, newTagId);
+        long todoTagId = briteDatabase.executeInsert(insertTodoTag.table, insertTodoTag.program);
+      }
     }
 
     // update TodoTag table by drop and re-insert
@@ -170,8 +176,8 @@ public class DbCrudHelper {
       Timber.d("DbCrudHelper:updateTodoString: %s rows were deleted for todo_id %s", deletedRows, todoId);
       for (long tagId : checkedTagIdList) {
         insertTodoTag.bind(todoId, tagId);
-        long insertedRows = briteDatabase.executeInsert(insertTodoTag.table, insertTodoTag.program);
-        Timber.d("DbCrudHelper:updateTodoString: %s rows were inserted for todo id %s", insertedRows, todoId);
+        long todoTagId = briteDatabase.executeInsert(insertTodoTag.table, insertTodoTag.program);
+        Timber.d("DbCrudHelper:updateTodoString: Id_%s: inserted for todo id %s", todoTagId, todoId);
       }
     }
   }
