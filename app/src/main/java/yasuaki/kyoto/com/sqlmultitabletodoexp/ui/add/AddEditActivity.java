@@ -19,6 +19,7 @@ import android.widget.EditText;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
 import timber.log.Timber;
@@ -54,6 +55,7 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
   private boolean isDataModified;
   private String fromMainTodoString;
   private LayoutManager rvLayoutManager;
+  private List<Tag> plainTagList;
 //  private int listSizeBeforeEdit;
 //  private static List<Long> checkedTagIdListBeforeEdit;
 
@@ -166,6 +168,7 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
 
   @Override
   public void setPlainTagList(List<Tag> plainTagList) {
+    this.plainTagList = plainTagList;
     tagRvAdapter.setPlainTagList(plainTagList);
     rvTag.setAdapter(tagRvAdapter);
   }
@@ -250,7 +253,6 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
     alertDialog.show();
   }
 
-
   @Override
   public void onBackPressed() {
     // If the pet hasn't changed, continue with handling back button press
@@ -288,15 +290,30 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
     List<Long> checkedTagIdList = tagRvAdapter.getCheckedTagIdList();
     boolean cbIsModified = false;
 
-    if (checkedTagIdList != null) {
-      cbIsModified = true;
-    }
-
     // TODOが未入力かどうか
     if (addedTodoStr.length() == 0) {
       closeActivity();
       return;
     }
+
+    // 新規入力タグが既存のタグと一致するかどうかチェック
+    if (addedTagStr.length() != 0) {
+      for(Tag addedTag: plainTagList){
+        if(addedTag.tag().equals(addedTagStr)){
+          if (checkedTagIdList == null) {
+            checkedTagIdList = new ArrayList<>();
+          }
+          long tagId = addedTag._id();
+          checkedTagIdList.add(tagId);
+          addedTagStr = "";
+        }
+      }
+    }
+
+    if (checkedTagIdList != null) {
+      cbIsModified = true;
+    }
+
     if (isEditMode) {
       // TodoString に変更はあるか && 新規タグが記載されたか && CheckBox の状態に変更はあるか
       if (addedTodoStr.equals(fromMainTodoString) && addedTagStr.length() == 0 && !cbIsModified) {
