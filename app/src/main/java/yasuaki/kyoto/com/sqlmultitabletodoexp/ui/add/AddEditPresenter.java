@@ -45,8 +45,9 @@ public class AddEditPresenter implements BasePresenter<AddEditMvpView> {
 
   }
 
-  public void updateTodo(String addedTodo, long todoId) {
-    dataManager.updateTodo(addedTodo, todoId);
+  public void updateTodo(String addedTodo, String addedTagStr, long todoId,
+      List<Long> checkedTagIdList) {
+    dataManager.updateTodo(addedTodo, addedTagStr, todoId, checkedTagIdList);
     Timber.d("AddEditPresenter:updateTodo: updated");
     addEditMvpView.closeActivity();
   }
@@ -57,8 +58,8 @@ public class AddEditPresenter implements BasePresenter<AddEditMvpView> {
     return deletedRows;
   }
 
-  public void loadTag() {
-    Timber.d("AddEditPresenter:loadTag: ");
+  public void loadPlainTag() {
+    Timber.d("AddEditPresenter:loadPlainTag: ");
     subscription.add(
         dataManager.loadTag()
             .subscribeOn(Schedulers.io())
@@ -77,7 +78,7 @@ public class AddEditPresenter implements BasePresenter<AddEditMvpView> {
 
               @Override
               public void onNext(List<Tag> tags) {
-                addEditMvpView.setTag(tags);
+                addEditMvpView.setPlainTagList(tags);
               }
             })
     );
@@ -102,7 +103,8 @@ public class AddEditPresenter implements BasePresenter<AddEditMvpView> {
 
               @Override
               public void onNext(List<Long> tagList) {
-                addEditMvpView.setTodo(tagList);
+                Timber.d("AddEditPresenter:loadTodoTag>onNext: ");
+                addEditMvpView.setTodoWithCheckedTag(tagList);
               }
             })
     );

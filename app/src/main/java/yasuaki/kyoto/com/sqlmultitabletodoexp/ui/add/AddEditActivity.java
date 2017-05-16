@@ -54,7 +54,8 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
   private boolean isDataModified;
   private String fromMainTodoString;
   private LayoutManager rvLayoutManager;
-  private long listSizeBeforeEdit;
+//  private int listSizeBeforeEdit;
+//  private static List<Long> checkedTagIdListBeforeEdit;
 
   public static final String TODO_EXTRA = "yasuaki.kyoto.com.sqlmultitabletodoexp.TODO_EXTRA";
 
@@ -65,7 +66,7 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
     ButterKnife.bind(this);
     getActivityComponent().inject(this);
     addEditPresenter.onAttachMvpView(this);
-    addEditPresenter.loadTag();
+    addEditPresenter.loadPlainTag();
 
     // 入力欄をタッチしたら、isDataModified を true にしているだけ
     editTodo.setOnTouchListener(touchListener);
@@ -74,24 +75,20 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
     // Edit モードか 新規追加モードかをチェック
     Intent intentFromMain = getIntent();
     todoFromMain = intentFromMain.getParcelableExtra(TODO_EXTRA);
+
     if (todoFromMain == null) {
       setTitle(getString(R.string.title_act_add));
       isEditMode = false;
       // menu を無効化
       invalidateOptionsMenu();
-      Timber.d("AddEditActivity:onCreate: ");
-
-
-
-
     } else {
       setTitle(getString(R.string.title_act_edit));
       isEditMode = true;
 
-      long todoId = todoFromMain._id();
+      long todoEditId = todoFromMain._id();
       // TodoId と紐付いたタグを取得する
-      Timber.d("AddEditActivity:onCreate: todoId is %s", todoId);
-      addEditPresenter.loadTodoTag(todoId);
+      Timber.d("AddEditActivity:onCreate: todoEditId is %s", todoEditId);
+      addEditPresenter.loadTodoTag(todoEditId);
     }
 
     rvLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
@@ -105,7 +102,7 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
   protected void onResume() {
     super.onResume();
     Timber.d("AddEditActivity:onResume: ");
-    addEditPresenter.loadTag();
+    addEditPresenter.loadPlainTag();
   }
 
   @Override
@@ -168,25 +165,23 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
   /*********************** Mvp implementation ***********************************/
 
   @Override
-  public void setTag(List<Tag> tagList) {
-    tagRvAdapter.setTagList(tagList);
+  public void setPlainTagList(List<Tag> plainTagList) {
+    tagRvAdapter.setPlainTagList(plainTagList);
     rvTag.setAdapter(tagRvAdapter);
-    Timber.d("AddEditActivity:setTag: set tagList to adapter");
   }
 
   @Override
-  public void setTodo(List<Long> checkedTagIdList) {
+  public void setTodoWithCheckedTag(List<Long> checkedTagIdList) {
     // Todoに紐付いたタグを取得してきてここに至る
     fromMainTodoString = todoFromMain.todo();
 
+//    checkedTagIdListBeforeEdit = checkedTagIdList;
+//    Timber.d("AddEditActivity:setTodoWithCheckedTag: checkedTagIdListBeforeEdit is %s", checkedTagIdListBeforeEdit);
     // Todoに紐付いたタグをAdapter に渡す
     tagRvAdapter.setCheckedTagList(checkedTagIdList);
-    Timber.d("AddEditActivity:setTodo: set checkedTagList to adapter list size is %s", checkedTagIdList.size());
-
-
-
     editTodo.setText(fromMainTodoString);
   }
+
   /*********************** OnTouchListener **********************/
 
   private View.OnTouchListener touchListener = new OnTouchListener() {
@@ -287,35 +282,31 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
   /*********************** onClick ************************/
   @OnClick(R.id.fab_todo_edit_ok)
   void onOkClicked() {
-    String addedTodo = editTodo.getText().toString();
-    String addedTag = editTag.getText().toString();
-    List<Long> checkedTagList = tagRvAdapter.getCheckedTag();
+    String addedTodoStr = editTodo.getText().toString();
+    String addedTagStr = editTag.getText().toString();
 
-    // TODOが未入力ならそのまま閉じる
-    if (addedTodo.length() == 0) {
+    List<Long> checkedTagIdList = tagRvAdapter.getCheckedTagIdList();
+    boolean cbIsModified = false;
+
+    if (checkedTagIdList != null) {
+      cbIsModified = true;
+    }
+
+    // TODOが未入力かどうか
+    if (addedTodoStr.length() == 0) {
       closeActivity();
       return;
     }
     if (isEditMode) {
-      // TODO: update tag
-      // 未変更なら挿入無しで閉じる
-      if (addedTodo.equals(fromMainTodoString) && addedTag.length() == 0 && checkedTagList.size() == listSizeBeforeEdit) {
+      // TodoString に変更はあるか && 新規タグが記載されたか && CheckBox の状態に変更はあるか
+      if (addedTodoStr.equals(fromMainTodoString) && addedTagStr.length() == 0 && !cbIsModified) {
         closeActivity();
         return;
       }
-      long todoId = todoFromMain._id();
-
-
-
-//      checkedTagList で TodoTag も更新する
-
-
-
-      addEditPresenter.updateTodo(addedTodo, todoId);
-
+      long modifiedTodoId = todoFromMain._id();
+      addEditPresenter.updateTodo(addedTodoStr, addedTagStr, modifiedTodoId, checkedTagIdList);
     } else {
-      Timber.d("AddEditActivity:onOkClicked: ");
-      addEditPresenter.saveTodo(addedTodo, addedTag, checkedTagList);
+      addEditPresenter.saveTodo(addedTodoStr, addedTagStr, checkedTagIdList);
     }
   }
 }

@@ -53,7 +53,7 @@ public class DataManager {
   }
 
   public Observable<List<Tag>> loadTag() {
-    Timber.d("DataManager:loadTag: ");
+    Timber.d("DataManager:loadPlainTag: ");
     return dbCrudHelper.loadTag()
         .map(new Func1<Cursor, List<Tag>>() {
 
@@ -114,8 +114,9 @@ public class DataManager {
     dbCrudHelper.updateTodoIsChecked(isChecked, id);
   }
 
-  public void updateTodo(String addedTodo, long todoId) {
-    dbCrudHelper.updateTodoString(addedTodo, todoId);
+  public void updateTodo(String addedTodo, String addedTagStr, long todoId,
+      List<Long> checkedTagIdList) {
+    dbCrudHelper.updateTodoString(addedTodo, addedTagStr, todoId, checkedTagIdList);
   }
 
   public int deleteTodo(long todoId) {

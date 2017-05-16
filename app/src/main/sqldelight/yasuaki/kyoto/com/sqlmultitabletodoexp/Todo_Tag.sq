@@ -1,7 +1,8 @@
 CREATE TABLE todo_tag (
   _id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   todo_id INTEGER NOT NULL REFERENCES todo(_id),
-  tag_id INTEGER NOT NULL REFERENCES tag(_id)
+  tag_id INTEGER NOT NULL REFERENCES tag(_id),
+  UNIQUE (todo_id, tag_id) ON CONFLICT REPLACE
 );
 
 insert_todo_tag:
@@ -19,4 +20,9 @@ WHERE todo_id = ? AND tag_id = ?;
 
 delete_todo_by_todo_id:
 DELETE FROM todo_tag
-WHERE todo_id =?;
+WHERE todo_id = ?;
+
+update_todo_tag:
+UPDATE todo_tag
+SET todo_id = ? AND tag_id = ?
+WHERE todo_id = ? AND  tag_id = ?;

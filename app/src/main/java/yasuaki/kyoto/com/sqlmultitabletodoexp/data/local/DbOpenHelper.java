@@ -3,6 +3,7 @@ package yasuaki.kyoto.com.sqlmultitabletodoexp.data.local;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.database.sqlite.SQLiteTransactionListener;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import timber.log.Timber;
@@ -12,9 +13,9 @@ import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.TodoTag;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.di.ApplicationContext;
 
 @Singleton
-public class DbOpenHelper extends SQLiteOpenHelper {
+public class DbOpenHelper extends SQLiteOpenHelper implements SQLiteTransactionListener {
 
-  public static final int DATABASE_VERSION = 14;
+  public static final int DATABASE_VERSION = 16;
   private static final String DATABASE_NAME = "todo.db";
 
   @Inject
@@ -45,13 +46,6 @@ public class DbOpenHelper extends SQLiteOpenHelper {
    */
   @Override
   public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-    db.execSQL("DROP TABLE IF EXISTS " + Todo.TABLE_NAME);
-    db.execSQL("DROP TABLE IF EXISTS " + Tag.TABLE_NAME);
-    db.execSQL("DROP TABLE IF EXISTS " + TodoTag.TABLE_NAME);
-
-    db.execSQL(Todo.CREATE_TABLE);
-    db.execSQL(Tag.CREATE_TABLE);
-    db.execSQL(TodoTag.CREATE_TABLE);
     Timber.d("DbOpenHelper:onUpgrade: oldVersion is %s, newVersion is %s", oldVersion, newVersion);
     if (oldVersion < newVersion) {
       // どのバージョンで、どんな変更をしたかは変わるじゃろ？
@@ -108,12 +102,7 @@ public class DbOpenHelper extends SQLiteOpenHelper {
                 + " DROP TABLE temp_" + Tag.TABLE_NAME + " COMMIT;"
         );
       }
-      if (oldVersion == 9) {
-        db.execSQL(Todo.CREATE_TABLE);
-        db.execSQL(Tag.CREATE_TABLE);
-        db.execSQL(TodoTag.CREATE_TABLE);
-      }
-      if (oldVersion == 10) {
+      if (oldVersion == 13) {
         db.execSQL("DROP TABLE IF EXISTS " + Todo.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + Tag.TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + TodoTag.TABLE_NAME);
@@ -122,6 +111,36 @@ public class DbOpenHelper extends SQLiteOpenHelper {
         db.execSQL(Tag.CREATE_TABLE);
         db.execSQL(TodoTag.CREATE_TABLE);
       }
+      if (oldVersion == 15) {
+        String columnsToCopyForTodoTag = " _id, todo_id, tag_id ";
+        db.beginTransactionWithListener(this);
+        try {
+          db.execSQL("ALTER TABLE " + TodoTag.TABLE_NAME + " RENAME TO temp_" + TodoTag.TABLE_NAME);
+          db.execSQL(TodoTag.CREATE_TABLE);
+          db.execSQL("INSERT INTO " + TodoTag.TABLE_NAME
+              + " SELECT " + columnsToCopyForTodoTag
+              + "FROM temp_" + TodoTag.TABLE_NAME);
+          db.execSQL("DROP TABLE temp_" + TodoTag.TABLE_NAME);
+        } catch (Exception e) {
+          e.printStackTrace();
+        } finally {
+          db.endTransaction();
+        }
+      }
     }
+  }
+
+  @Override
+  public void onBegin() {
+    Timber.d("DbOpenHelper:onBegin: start transaction");
+  }
+  @Override
+  public void onCommit() {
+    Timber.d("DbOpenHelper:onCommit: commit transaction");
+  }
+  @Override
+  public void onRollback() {
+    Timber.d("DbOpenHelper:onRollback: rollback transaction");
+
   }
 }

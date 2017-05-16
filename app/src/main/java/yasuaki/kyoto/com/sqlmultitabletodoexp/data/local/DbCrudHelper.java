@@ -7,7 +7,6 @@ import android.database.sqlite.SQLiteDatabase;
 import com.squareup.sqlbrite.BriteDatabase;
 import com.squareup.sqlbrite.SqlBrite;
 import com.squareup.sqlbrite.SqlBrite.Builder;
-import com.squareup.sqlbrite.SqlBrite.Logger;
 import com.squareup.sqlbrite.SqlBrite.Query;
 import com.squareup.sqldelight.SqlDelightStatement;
 import java.util.List;
@@ -33,7 +32,7 @@ public class DbCrudHelper {
 
   private final BriteDatabase briteDatabase;
   private Todo.Insert_todo insertTodo;
-  private Todo.Update_isChecked updateIsChecked;
+  private Todo.Update_isChecked updateTodoIsChecked;
   private Todo.Update_todoString updateTodoString;
   private Todo.Delete_todo deleteTodo;
 
@@ -46,19 +45,20 @@ public class DbCrudHelper {
   public DbCrudHelper(DbOpenHelper openHelper) {
 
     SqlBrite sqlBrite = new Builder()
-        .logger(new Logger() {
-          @Override
-          public void log(String message) {
-            Timber.d("DbCrudHelper:log: %s", message);
-          }
-        })
+//        .logger(new Logger() {
+//          @Override
+//          public void log(String message) {
+//            Timber.d("DbCrudHelper:log: %s", message);
+//          }
+//        })
         .build();
 
     briteDatabase = sqlBrite.wrapDatabaseHelper(openHelper, Schedulers.io());
     SQLiteDatabase sqLiteWritableDatabase = briteDatabase.getWritableDatabase();
+
     // SqlDelight で生成された コンパイル済みSQLステートメントをインスタンス化
     insertTodo = new Insert_todo(sqLiteWritableDatabase);
-    updateIsChecked = new Update_isChecked(sqLiteWritableDatabase);
+    updateTodoIsChecked = new Update_isChecked(sqLiteWritableDatabase);
     updateTodoString = new Update_todoString(sqLiteWritableDatabase);
     deleteTodo = new Delete_todo(sqLiteWritableDatabase);
 
@@ -67,15 +67,16 @@ public class DbCrudHelper {
     deleteTodoByTodoId = new Delete_todo_by_todo_id(sqLiteWritableDatabase);
   }
 
+  /***************************** load **********************************************/
   public Observable<Cursor> loadTodo() {
     // SqlDelight が生成した SQL ステートメント
-    SqlDelightStatement selectAllQuery = Todo.TODO_FACTORY.select_all();
+    SqlDelightStatement selectAllTodoQuery = Todo.TODO_FACTORY.select_all();
 
     // 返り値は QueryObservable
     return briteDatabase.createQuery(
         Todo.TABLE_NAME,
-        selectAllQuery.statement,
-        selectAllQuery.args)
+        selectAllTodoQuery.statement,
+        selectAllTodoQuery.args)
         .map(new Func1<Query, Cursor>() {
           @Override
           public Cursor call(Query query) {
@@ -109,34 +110,35 @@ public class DbCrudHelper {
         });
   }
 
+  /***************************** insert **********************************************/
 
-  public long insertTodo(String todo, String addedTag, List<Long> checkedTagList) {
+  public long insertTodo(String todoStr, String addedTagStr, List<Long> checkedTagIdList) {
     Timber.d("DbCrudHelper:insertTodo: ");
     long now = System.currentTimeMillis();
-    long tagId;
 
     // Todoテーブル にInsert
-    insertTodo.bind(todo, false, now, now);
-    long todoId = briteDatabase.executeInsert(insertTodo.table, insertTodo.program);
+    insertTodo.bind(todoStr, false, now, now);
+    long newTodoId = briteDatabase.executeInsert(insertTodo.table, insertTodo.program);
+    Timber.d("DbCrudHelper:insertTodo: Id_%s: %s is inserted into todo table", newTodoId, todoStr);
 
     // 新規挿入時に、タグも追加されているかどうか
-    if (addedTag.length() == 0) {
-      tagId = 0;
-    } else {
+    if (addedTagStr.length() != 0) {
       // タグテーブルにInsert
-      tagId = insertTag(addedTag);
+      long newTagId = insertTag(addedTagStr);
+      Timber.d("DbCrudHelper:insertTodo: ID_%s: %s is inserted into tag table", newTagId, addedTagStr);
       // TodoTag テーブルにも挿入
-      insertTodoTag.bind(todoId, tagId);
+      insertTodoTag.bind(newTodoId, newTagId);
       long todoTagId = briteDatabase.executeInsert(insertTodoTag.table, insertTodoTag.program);
+      Timber.d("DbCrudHelper:insertTodo: ID_%s is inserted into TodoTag table", todoTagId);
     }
 
-    if (checkedTagList != null) {
-      for (long checkedTagId : checkedTagList) {
-        insertTodoTag.bind(todoId, checkedTagId);
+    if (checkedTagIdList != null) {
+      for (long checkedTagId : checkedTagIdList) {
+        insertTodoTag.bind(newTodoId, checkedTagId);
         briteDatabase.executeInsert(insertTodoTag.table, insertTodoTag.program);
       }
     }
-    return todoId;
+    return newTodoId;
   }
 
   public long insertTag(String addedTag) {
@@ -145,16 +147,41 @@ public class DbCrudHelper {
     return briteDatabase.executeInsert(insertTag.table, insertTag.program);
   }
 
-  public void updateTodoIsChecked(boolean isChecked, long id) {
+  /***************************** update **********************************************/
+  public void updateTodoString(String addedTodoStr, String addedTagStr, long todoId, List<Long> checkedTagIdList) {
 
-    updateIsChecked.bind(isChecked, id);
-    briteDatabase.executeUpdateDelete(updateIsChecked.table, updateIsChecked.program);
-  }
-
-  public void updateTodoString(String addedTodo, long todoId) {
-    updateTodoString.bind(addedTodo, todoId);
+    updateTodoString.bind(addedTodoStr, todoId);
     int id = briteDatabase.executeUpdateDelete(updateTodoString.table, updateTodoString.program);
+
+    // tag も新規作成されていた場合、挿入
+    if (addedTagStr.length() != 0) {
+      // タグテーブルにInsert
+      long newTagId = insertTag(addedTagStr);
+      // TodoTag テーブルにも挿入
+      insertTodoTag.bind(todoId, newTagId);
+      long todoTagId = briteDatabase.executeInsert(insertTodoTag.table, insertTodoTag.program);
+    }
+
+    // update TodoTag table by drop and re-insert
+    if (checkedTagIdList != null) {
+
+      deleteTodoByTodoId.bind(todoId);
+      long deletedRows = briteDatabase.executeUpdateDelete(deleteTodoByTodoId.table, deleteTodoByTodoId.program);
+      Timber.d("DbCrudHelper:updateTodoString: %s rows were deleted for todo_id %s", deletedRows, todoId);
+      for (long tagId : checkedTagIdList) {
+        insertTodoTag.bind(todoId, tagId);
+        long insertedRows = briteDatabase.executeInsert(insertTodoTag.table, insertTodoTag.program);
+        Timber.d("DbCrudHelper:updateTodoString: %s rows were inserted for todo id %s", insertedRows, todoId);
+      }
+    }
   }
+
+  public void updateTodoIsChecked(boolean isTodoChecked, long todoId) {
+    updateTodoIsChecked.bind(isTodoChecked, todoId);
+    briteDatabase.executeUpdateDelete(updateTodoIsChecked.table, updateTodoIsChecked.program);
+  }
+
+  /***************************** delete **********************************************/
 
   public int deleteTodo(long todoId) {
     deleteTodoByTodoId.bind(todoId);
@@ -162,6 +189,4 @@ public class DbCrudHelper {
     deleteTodo.bind(todoId);
     return briteDatabase.executeUpdateDelete(deleteTodo.table, deleteTodo.program);
   }
-
-
 }

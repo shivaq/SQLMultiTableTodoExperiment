@@ -12,7 +12,7 @@ public interface AddEditMvpView extends BaseMvpView{
 
   void closeActivity();
 
-  void setTag(List<Tag> tags);
+  void setPlainTagList(List<Tag> tags);
 
-  void setTodo(List<Long> tagIdList);
+  void setTodoWithCheckedTag(List<Long> tagIdList);
 }
