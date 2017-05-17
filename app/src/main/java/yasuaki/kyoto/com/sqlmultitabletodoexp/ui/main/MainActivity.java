@@ -21,7 +21,7 @@ import yasuaki.kyoto.com.sqlmultitabletodoexp.di.component.ActivityComponent;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.ui.add.AddEditActivity;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.ui.base.BaseActivity;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.ui.main.MainRvAdapter.RvCallback;
-import yasuaki.kyoto.com.sqlmultitabletodoexp.ui.tagedit.TagListActivity;
+import yasuaki.kyoto.com.sqlmultitabletodoexp.ui.taglist.TagListActivity;
 
 public class MainActivity extends BaseActivity implements MainMvpView, RvCallback {
 

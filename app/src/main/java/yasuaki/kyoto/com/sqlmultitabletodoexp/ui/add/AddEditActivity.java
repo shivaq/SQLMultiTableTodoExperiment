@@ -65,12 +65,14 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
     ActionBar actionBar = getSupportActionBar();
     actionBar.setDisplayHomeAsUpEnabled(true);
 
-    addEditPresenter.onAttachMvpView(this);
-    addEditPresenter.loadPlainTag();
-
     // 入力欄をタッチしたら、isDataModified を true にしているだけ
     editTodo.setOnTouchListener(touchListener);
     editTag.setOnTouchListener(touchListener);
+
+    addEditPresenter.onAttachMvpView(this);
+    addEditPresenter.loadPlainTag();
+
+
 
     // Edit モードか 新規追加モードかをチェック
     Intent intentFromMain = getIntent();

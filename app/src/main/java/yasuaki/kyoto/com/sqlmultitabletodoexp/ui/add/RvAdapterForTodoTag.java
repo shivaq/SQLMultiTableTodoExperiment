@@ -36,7 +36,7 @@ public class RvAdapterForTodoTag extends RecyclerView.Adapter<TagRvViewHolder> {
   @Override
   public TagRvViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
     View rvTagItemView = LayoutInflater.from(parent.getContext())
-        .inflate(R.layout.rcy_tag_list_item, parent, false);
+        .inflate(R.layout.rv_item_edit_todo_tag_list, parent, false);
     return new TagRvViewHolder(rvTagItemView);
   }
 

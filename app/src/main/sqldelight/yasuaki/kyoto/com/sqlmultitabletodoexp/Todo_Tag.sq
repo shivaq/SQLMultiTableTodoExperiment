@@ -14,6 +14,11 @@ SELECT *
 FROM todo_tag
 WHERE todo_id = ?;
 
+select_todos_for_tagid:
+SELECT *
+FROM todo_tag
+WHERE tag_id = ?;
+
 delete_todo_with_tag:
 DELETE FROM todo_tag
 WHERE todo_id = ? AND tag_id = ?;

@@ -1,6 +1,4 @@
-package yasuaki.kyoto.com.sqlmultitabletodoexp.ui.tagedit;
-
-import static android.R.attr.tag;
+package yasuaki.kyoto.com.sqlmultitabletodoexp.ui.taglist;
 
 import java.util.List;
 import javax.inject.Inject;

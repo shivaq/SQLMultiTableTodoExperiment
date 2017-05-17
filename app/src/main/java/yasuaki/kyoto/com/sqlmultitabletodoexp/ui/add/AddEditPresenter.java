@@ -34,6 +34,7 @@ public class AddEditPresenter implements BasePresenter<AddEditMvpView> {
     subscription.unsubscribe();
   }
 
+  /*********************** save update delete ****************************/
   public void saveTodo(String todo, String addedTag, List<Long> checkedTagList) {
     dataManager.insertTodo(todo, addedTag, checkedTagList);
     addEditMvpView.closeActivity();

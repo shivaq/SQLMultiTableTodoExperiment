@@ -22,20 +22,20 @@ import yasuaki.kyoto.com.sqlmultitabletodoexp.ui.main.MainRvAdapter.MainRvViewHo
  * Created by Yasuaki on 2017/05/09.
  */
 
-public class MainRvAdapter extends RecyclerView.Adapter<MainRvViewHolder>{
+public class MainRvAdapter extends RecyclerView.Adapter<MainRvViewHolder> {
 
   private static List<Todo> todoList;
   private RvCallback rvCallback;
 
   @Inject
-  MainRvAdapter(){
+  MainRvAdapter() {
     todoList = new ArrayList<>();
   }
 
   @Override
   public MainRvViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
     View mainRvItemView = LayoutInflater.from(parent.getContext())
-        .inflate(R.layout.rcy_todo_list_item, parent, false);
+        .inflate(R.layout.rv_item_todo_list, parent, false);
     return new MainRvViewHolder(mainRvItemView);
   }
 
@@ -53,8 +53,8 @@ public class MainRvAdapter extends RecyclerView.Adapter<MainRvViewHolder>{
     todoCb.setChecked(isTodoChecked);
 
     // API 24 以前にも互換性があるが、相対的にコスト高になるとのこと
-    holder.cbTodo.setOnClickListener(view ->{
-      if(rvCallback != null){
+    holder.cbTodo.setOnClickListener(view -> {
+      if (rvCallback != null) {
         rvCallback.onRvTodoCbClicked(!isTodoChecked, todoId);
       }
     });
@@ -92,7 +92,7 @@ public class MainRvAdapter extends RecyclerView.Adapter<MainRvViewHolder>{
   public void onAttachedToRecyclerView(RecyclerView recyclerView) {
     super.onAttachedToRecyclerView(recyclerView);
     Timber.d("MainRvAdapter:onAttachedToRecyclerView: ");
-    if(rvCallback != null){
+    if (rvCallback != null) {
       rvCallback.onRvRefreshed();
     }
   }
@@ -110,26 +110,28 @@ public class MainRvAdapter extends RecyclerView.Adapter<MainRvViewHolder>{
 
   /******************  *****************/
 
-  public void setTodoList(List<Todo> todoList){
+  public void setTodoList(List<Todo> todoList) {
     this.todoList = todoList;
   }
 
 
   /*********************** ClickListener *****************************/
-  interface RvCallback{
+  interface RvCallback {
+
     void onRvTodoCbClicked(boolean isChecked, long id);
+
     void onRvItemClicked(Todo clickedTodo);
+
     void onRvRefreshed();
   }
 
-  public void registerRvCallback(RvCallback rvCallback){
+  public void registerRvCallback(RvCallback rvCallback) {
     this.rvCallback = rvCallback;
   }
 
 
-
   /**************************************************************/
-  class MainRvViewHolder extends RecyclerView.ViewHolder{
+  class MainRvViewHolder extends RecyclerView.ViewHolder {
 
     @BindView(R.id.cb_todo)
     CheckBox cbTodo;
@@ -145,13 +147,12 @@ public class MainRvAdapter extends RecyclerView.Adapter<MainRvViewHolder>{
       ButterKnife.bind(this, itemView);
     }
 
-    /********************* OnClick **********************************************/
     // CallBack メソッドを、ViewHolder 内のクリックListenerからも呼び出せる
     @OnClick(R.id.container_rv_item_todo)
-    void onRvTodoClicked(){
+    void onRvTodoClicked() {
       int adapterPosition = getAdapterPosition();
       Todo clickedTodo = todoList.get(adapterPosition);
-      if(rvCallback!=null){
+      if (rvCallback != null) {
         rvCallback.onRvItemClicked(clickedTodo);
       }
     }

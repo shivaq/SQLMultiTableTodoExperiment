@@ -1,5 +1,6 @@
-package yasuaki.kyoto.com.sqlmultitabletodoexp.ui.tagedit;
+package yasuaki.kyoto.com.sqlmultitabletodoexp.ui.taglist;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -14,8 +15,10 @@ import yasuaki.kyoto.com.sqlmultitabletodoexp.RvItemDecorator;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Tag;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Tag.TagWithTodoCounts;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.ui.base.BaseActivity;
+import yasuaki.kyoto.com.sqlmultitabletodoexp.ui.tagdetail.TagDetailActivity;
+import yasuaki.kyoto.com.sqlmultitabletodoexp.ui.taglist.RvAdapterForTagList.RvTagCallback;
 
-public class TagListActivity  extends BaseActivity implements TagListMvpView{
+public class TagListActivity  extends BaseActivity implements TagListMvpView, RvTagCallback{
 
   @Inject
   TagListPresenter tagListPresenter;
@@ -44,8 +47,10 @@ public class TagListActivity  extends BaseActivity implements TagListMvpView{
     rvEditTag.setHasFixedSize(true);
     rvEditTag.addItemDecoration(new RvItemDecorator(this));
     rvEditTag.setAdapter(rvAdapterForTagList);
+    rvAdapterForTagList.registerRvTagCallback(this);
   }
 
+  /******************************** mvp implementation  ***************************************/
   @Override
   public void setTagList(List<Tag> tags) {
     rvAdapterForTagList.setTagList(tags);
@@ -63,5 +68,13 @@ public class TagListActivity  extends BaseActivity implements TagListMvpView{
     rvAdapterForTagList.setTagList(tagList);
     rvAdapterForTagList.setTagCountList(tagCountsList);
     rvEditTag.setAdapter(rvAdapterForTagList);
+  }
+
+  /******************************** callback implementation  ***************************************/
+  @Override
+  public void onRvTagItemClicked(Tag clickedTag) {
+    Intent intent = new Intent(this, TagDetailActivity.class);
+    intent.putExtra(TagDetailActivity.TAG_EXTRA, clickedTag);
+    startActivity(intent);
   }
 }

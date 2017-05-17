@@ -122,4 +122,5 @@
 
 
     <color name="ripple_color">@color/pink_300</color>
+    <color name="rv_item_divider">@color/yellow_5a</color>
 </resources>

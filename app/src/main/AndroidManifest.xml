@@ -27,12 +27,13 @@
     </activity>
     <activity
       android:label="Tag 編集"
-      android:name=".ui.tagedit.TagListActivity"
-      android:parentActivityName=".ui.main.MainActivity"
-      >
+      android:name=".ui.taglist.TagListActivity"
+      android:parentActivityName=".ui.main.MainActivity">
       <meta-data
         android:name="android.support.PARENT_ACTIVITY"
         android:value=".ui.main.MainActivity"/>
+    </activity>
+    <activity android:name=".ui.tagdetail.TagDetailActivity">
     </activity>
   </application>
 

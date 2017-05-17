@@ -1,4 +1,4 @@
-package yasuaki.kyoto.com.sqlmultitabletodoexp.ui.tagedit;
+package yasuaki.kyoto.com.sqlmultitabletodoexp.ui.taglist;
 
 import java.util.List;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Tag;
