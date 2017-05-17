@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.NavUtils;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -61,6 +62,9 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
     setContentView(R.layout.activity_add);
     ButterKnife.bind(this);
     getActivityComponent().inject(this);
+    ActionBar actionBar = getSupportActionBar();
+    actionBar.setDisplayHomeAsUpEnabled(true);
+
     addEditPresenter.onAttachMvpView(this);
     addEditPresenter.loadPlainTag();
 
@@ -218,8 +222,6 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
     // Create and show the AlertDialog
     AlertDialog alertDialog = builder.create();
     alertDialog.show();
-
-
   }
 
   private void showUnsavedChangesDialog(
