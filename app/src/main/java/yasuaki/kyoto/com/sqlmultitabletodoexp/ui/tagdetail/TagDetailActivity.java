@@ -8,13 +8,17 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.widget.EditText;
-import android.widget.Toast;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import java.util.ArrayList;
+import java.util.List;
 import javax.inject.Inject;
+import timber.log.Timber;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.R;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.RvItemDecorator;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Tag;
+import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Todo;
+import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Todo.TodoForTag;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.ui.base.BaseActivity;
 
 public class TagDetailActivity extends BaseActivity implements TagDetailMvpView {
@@ -33,6 +37,7 @@ public class TagDetailActivity extends BaseActivity implements TagDetailMvpView 
   private boolean isDataModified;
   private Tag tagFromTagListActivity;
 
+
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -45,10 +50,11 @@ public class TagDetailActivity extends BaseActivity implements TagDetailMvpView 
 
     Intent intentFromTagList = getIntent();
     tagFromTagListActivity = intentFromTagList.getParcelableExtra(TAG_EXTRA);
+    tagEditText.setText(tagFromTagListActivity.tag());
     if (tagFromTagListActivity != null) {
       long tagId = tagFromTagListActivity._id();
-      Toast.makeText(this, "tag is " + tagFromTagListActivity, Toast.LENGTH_SHORT).show();
-//      tagDetailPresenter.loadTodoForTag(tagId);
+//      Toast.makeText(this, "tag is " + tagFromTagListActivity, Toast.LENGTH_SHORT).show();
+      tagDetailPresenter.loadTodoForTag(tagId);
     }
 
     LinearLayoutManager linearLayoutManager = new LinearLayoutManager(this,
@@ -73,5 +79,16 @@ public class TagDetailActivity extends BaseActivity implements TagDetailMvpView 
       return false;
     }
   };
+  /****************************** mvp implementation **************************************/
+  @Override
+  public void setTodoForTagList(List<TodoForTag> todoForTagList) {
+    List<Todo> todoList = new ArrayList();
+    for(TodoForTag todoForTag: todoForTagList){
+      todoList.add(todoForTag.todo());
+    }
+    Timber.d("TagDetailActivity:setTodoForTagList: todoList size is %s", todoList.size());
+    rvAdapterTagDetail.setTodoList(todoList);
+    RvTagEdit.setAdapter(rvAdapterTagDetail);
+  }
 }
 

@@ -1,5 +1,7 @@
 package yasuaki.kyoto.com.sqlmultitabletodoexp.ui.tagdetail;
 
+import java.util.List;
+import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Todo.TodoForTag;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.ui.base.BaseMvpView;
 
 /**
@@ -8,4 +10,5 @@ import yasuaki.kyoto.com.sqlmultitabletodoexp.ui.base.BaseMvpView;
 
 interface TagDetailMvpView extends BaseMvpView {
 
+  void setTodoForTagList(List<TodoForTag> tagList);
 }

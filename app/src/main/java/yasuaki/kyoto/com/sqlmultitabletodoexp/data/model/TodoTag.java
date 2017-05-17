@@ -12,6 +12,6 @@ public abstract class TodoTag implements Todo_TagModel{
   public static final RowMapper<TodoTag> TAG_FOR_TODO_ROW_MAPPER =
       TODO_TAG_FACTORY.select_tags_for_todoidMapper();
 
-  public static final RowMapper<Long> COUNT_MAPPER = TODO_TAG_FACTORY.count_todos_for_tagMapper();
-
+  public static final RowMapper<TodoTag> TODO_FOR_TAG_ROW_MAPPER =
+      TODO_TAG_FACTORY.select_todos_for_tagidMapper();
 }

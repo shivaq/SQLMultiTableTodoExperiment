@@ -110,6 +110,60 @@ public class DbCrudHelper {
         });
   }
 
+  public Observable<Cursor> loadTodoForTag(long tagId) {
+    SqlDelightStatement selectTodosForTag = Todo.TODO_FACTORY
+        .select_todo_for_tag(tagId);
+    return briteDatabase.createQuery(
+        Todo.TABLE_NAME, selectTodosForTag.statement, selectTodosForTag.args)
+        .map(new Func1<Query, Cursor>() {
+          @Override
+          public Cursor call(Query query) {
+            return query.run();
+          }
+        });
+  }
+//  public Observable<Cursor> loadTodoForTag(long tagId) {
+//    SqlDelightStatement selectTodosForTag = Todo.TODO_FACTORY.select_todo_for_tag(tagId);
+//    Timber.d("DbCrudHelper:loadTodoForTag: tagId is %s, statement is %s with %s", tagId,
+//        selectTodosForTag.statement, selectTodosForTag.args);
+//    return briteDatabase.createQuery(
+//        Todo.TABLE_NAME, selectTodosForTag.statement, selectTodosForTag.args)
+//        .map(new Func1<Query, Cursor>() {
+//          @Override
+//          public Cursor call(Query query) {
+//            return query.run();
+//          }
+//        });
+//  }
+
+//  public Observable<Cursor> loadTodoForTag(long tagId) {
+//    SqlDelightStatement selectTodosForTag = TodoTag.TODO_TAG_FACTORY
+//        .select_tags_for_todoid(tagId);
+//    return briteDatabase.createQuery(
+//        TodoTag.TABLE_NAME, selectTodosForTag.statement, selectTodosForTag.args)
+//        .map(new Func1<Query, Cursor>() {
+//          @Override
+//          public Cursor call(Query query) {
+//            return query.run();
+//          }
+//        });
+//  }
+
+//  public Observable<Cursor> loadTodoBYId(long todoId){
+//    SqlDelightStatement selectTodoById = Todo.TODO_FACTORY
+//        .select_todo_by_id(todoId);
+//    return briteDatabase.createQuery(
+//        Todo.TABLE_NAME, selectTodoById.statement, selectTodoById.args)
+//        .map(new Func1<Query, Cursor>(){
+//
+//          @Override
+//          public Cursor call(Query query) {
+//            return query.run();
+//          }
+//        }
+//    );
+//  }
+
   public Observable<Cursor> loadTagWithTodoCounts() {
     SqlDelightStatement selectAllTagWithCounts = TAG_FACTORY.select_all_with_todo_counts();
 

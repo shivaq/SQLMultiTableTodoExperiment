@@ -12,6 +12,7 @@ import yasuaki.kyoto.com.sqlmultitabletodoexp.data.local.DbCrudHelper;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Tag;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Tag.TagWithTodoCounts;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Todo;
+import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Todo.TodoForTag;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.TodoTag;
 
 /**
@@ -102,6 +103,31 @@ public class DataManager {
         });
   }
 
+  public Observable<List<TodoForTag>> loadTodoForTag(long tagId) {
+    return dbCrudHelper.loadTodoForTag(tagId)
+        .map(new Func1<Cursor, List<TodoForTag>>(){
+
+          @Override
+          public List<TodoForTag> call(Cursor cursor) {
+            List<TodoForTag> todoForTagList = new ArrayList();
+            Timber.d("DataManager:call: cursor size is %s", cursor.getCount());
+            try{
+              if(cursor.moveToFirst()){
+                for(int i = 0; i < cursor.getCount(); i++){
+
+                  TodoForTag todoForTag = Todo.SELECT_TODO_FOR_TAG_MAPPER.map(cursor);
+                  todoForTagList.add(todoForTag);
+                  cursor.moveToNext();
+                }
+              }
+            } finally{
+              cursor.close();
+            }
+            return todoForTagList;
+          }
+        });
+  }
+
   public Observable<List<TagWithTodoCounts>> loadTagWithTodoCounts() {
     return dbCrudHelper.loadTagWithTodoCounts()
         .map(new Func1<Cursor, List<TagWithTodoCounts>>(){
@@ -147,6 +173,7 @@ public class DataManager {
   public int deleteTodo(long todoId) {
     return dbCrudHelper.deleteTodo(todoId);
   }
+
 
 
 }

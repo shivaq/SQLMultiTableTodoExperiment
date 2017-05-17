@@ -17,4 +17,16 @@ public abstract class Todo implements TodoModel, Parcelable {
   // RowMapper →select結果をオブジェクトにして返却
   public static final RowMapper<Todo> SELECT_ALL_MAPPER =
       TODO_FACTORY.select_allMapper();
+
+  public static final RowMapper<TodoForTag> SELECT_TODO_FOR_TAG_MAPPER =
+      TODO_FACTORY
+          .select_todo_for_tagMapper((AutoValue_Todo_TodoForTag::new), TodoTag.TODO_TAG_FACTORY);
+
+  public static final RowMapper<Todo> SELECT_TODO_BY_ID_MAPPER =
+      TODO_FACTORY.select_todo_by_idMapper();
+
+  @AutoValue
+  public static abstract class TodoForTag implements Select_todo_for_tagModel<Todo, TodoTag> {
+
+  }
 }

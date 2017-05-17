@@ -1,5 +1,3 @@
-import java.util.Calendar;
-
 CREATE TABLE todo(
   _id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   todo TEXT NOT NULL,
@@ -29,3 +27,21 @@ WHERE _id = ?;
 delete_todo:
 DELETE FROM todo
 WHERE _id = ?;
+
+--select_todo_for_tag:
+--SELECT *
+--FROM todo
+--WHERE _id = (
+--    SELECT *
+--    FROM todo_tag
+--    WHERE tag_id = ?);
+
+select_todo_by_id:
+SELECT *
+FROM todo
+WHERE _id = ?;
+
+select_todo_for_tag:
+SELECT *
+FROM todo LEFT OUTER JOIN todo_tag ON todo._id = todo_tag.todo_id
+WHERE todo_tag.tag_id = ?;
