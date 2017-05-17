@@ -26,3 +26,8 @@ update_todo_tag:
 UPDATE todo_tag
 SET todo_id = ? AND tag_id = ?
 WHERE todo_id = ? AND  tag_id = ?;
+
+count_todos_for_tag:
+SELECT COUNT(*)
+FROM todo_tag
+WHERE tag_id = ?;

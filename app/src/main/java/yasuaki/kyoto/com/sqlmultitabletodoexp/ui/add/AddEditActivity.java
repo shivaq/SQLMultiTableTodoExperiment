@@ -38,9 +38,6 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
   AddEditPresenter addEditPresenter;
   @Inject
   RvAdapterForTodoTag rvAdapterForTodoTag;
-//  @Inject
-//  @ApplicationContext
-//  Context context;
 
   @BindView(R.id.editTodo)
   EditText editTodo;

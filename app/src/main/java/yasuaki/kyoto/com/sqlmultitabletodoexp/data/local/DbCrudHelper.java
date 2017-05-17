@@ -110,6 +110,27 @@ public class DbCrudHelper {
         });
   }
 
+  public Observable<Cursor> loadTagWithTodoCounts() {
+    SqlDelightStatement selectAllTagWithCounts = TAG_FACTORY.select_all_with_todo_counts();
+
+    // COUNT 順 に対応する 手打ちステートメント
+    String selectAllTagWithCountsQuery = "SELECT * , COUNT(todo_tag._id) AS tag_count"
+        + " FROM tag LEFT OUTER JOIN todo_tag ON tag._id = todo_tag.tag_id"
+        + " GROUP BY tag"
+        + " ORDER BY tag_count ASC;";
+
+    return briteDatabase.createQuery(
+        Tag.TABLE_NAME, selectAllTagWithCounts.statement, selectAllTagWithCounts.args)
+//        Tag.TABLE_NAME, selectAllTagWithCountsQuery, selectAllTagWithCounts.args)
+        .map(new Func1<Query, Cursor>() {
+               @Override
+               public Cursor call(Query query) {
+                 return query.run();
+               }
+             }
+        );
+  }
+
   /***************************** insert **********************************************/
 
   public long insertTodo(String todoStr, String addedTagStr, List<Long> checkedTagIdList) {
@@ -125,7 +146,8 @@ public class DbCrudHelper {
     if (addedTagStr.length() != 0) {
       // タグテーブルにInsert
       long newTagId = insertTag(addedTagStr);
-      Timber.d("DbCrudHelper:insertTodo: ID_%s: %s is inserted into tag table", newTagId, addedTagStr);
+      Timber.d("DbCrudHelper:insertTodo: ID_%s: %s is inserted into tag table", newTagId,
+          addedTagStr);
       // TodoTag テーブルにも挿入
       insertTodoTag.bind(newTodoId, newTagId);
       long todoTagId = briteDatabase.executeInsert(insertTodoTag.table, insertTodoTag.program);
@@ -148,7 +170,8 @@ public class DbCrudHelper {
   }
 
   /***************************** update **********************************************/
-  public void updateTodoString(String addedTodoStr, String addedTagStr, long todoId, List<Long> checkedTagIdList) {
+  public void updateTodoString(String addedTodoStr, String addedTagStr, long todoId,
+      List<Long> checkedTagIdList) {
 
     updateTodoString.bind(addedTodoStr, todoId);
     int id = briteDatabase.executeUpdateDelete(updateTodoString.table, updateTodoString.program);
@@ -158,10 +181,10 @@ public class DbCrudHelper {
       // タグテーブルにInsert
       long newTagId = insertTag(addedTagStr);
 
-      if(checkedTagIdList != null){
+      if (checkedTagIdList != null) {
         // todoTag の再挿入時に追加させる
         checkedTagIdList.add(newTagId);
-      } else{
+      } else {
         // TodoTag テーブルに挿入
         insertTodoTag.bind(todoId, newTagId);
         long todoTagId = briteDatabase.executeInsert(insertTodoTag.table, insertTodoTag.program);
@@ -172,12 +195,15 @@ public class DbCrudHelper {
     if (checkedTagIdList != null) {
 
       deleteTodoByTodoId.bind(todoId);
-      long deletedRows = briteDatabase.executeUpdateDelete(deleteTodoByTodoId.table, deleteTodoByTodoId.program);
-      Timber.d("DbCrudHelper:updateTodoString: %s rows were deleted for todo_id %s", deletedRows, todoId);
+      long deletedRows = briteDatabase
+          .executeUpdateDelete(deleteTodoByTodoId.table, deleteTodoByTodoId.program);
+      Timber.d("DbCrudHelper:updateTodoString: %s rows were deleted for todo_id %s", deletedRows,
+          todoId);
       for (long tagId : checkedTagIdList) {
         insertTodoTag.bind(todoId, tagId);
         long todoTagId = briteDatabase.executeInsert(insertTodoTag.table, insertTodoTag.program);
-        Timber.d("DbCrudHelper:updateTodoString: Id_%s: inserted for todo id %s", todoTagId, todoId);
+        Timber
+            .d("DbCrudHelper:updateTodoString: Id_%s: inserted for todo id %s", todoTagId, todoId);
       }
     }
   }
@@ -195,4 +221,6 @@ public class DbCrudHelper {
     deleteTodo.bind(todoId);
     return briteDatabase.executeUpdateDelete(deleteTodo.table, deleteTodo.program);
   }
+
+
 }

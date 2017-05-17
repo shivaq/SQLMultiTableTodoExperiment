@@ -10,6 +10,7 @@ import rx.functions.Func1;
 import timber.log.Timber;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.local.DbCrudHelper;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Tag;
+import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Tag.TagWithTodoCounts;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Todo;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.TodoTag;
 
@@ -97,6 +98,30 @@ public class DataManager {
               cursor.close();
             }
             return tagList;
+          }
+        });
+  }
+
+  public Observable<List<TagWithTodoCounts>> loadTagWithTodoCounts() {
+    return dbCrudHelper.loadTagWithTodoCounts()
+        .map(new Func1<Cursor, List<TagWithTodoCounts>>(){
+
+          @Override
+          public List<TagWithTodoCounts> call(Cursor cursor) {
+            List<TagWithTodoCounts> tagWithTodoCountsList = new ArrayList();
+            try{
+              if(cursor.moveToFirst()){
+                for(int i = 0; i < cursor.getCount(); i++){
+                  TagWithTodoCounts tagWithTodoCounts = Tag.TAGWITHTODOCOUNTS_ROW_MAPPER.map(cursor);
+                  tagWithTodoCountsList.add(tagWithTodoCounts);
+                  cursor.moveToNext();
+                }
+              }
+            }finally{
+              cursor.close();
+            }
+            Timber.d("DataManager:call: tagWithTodoCountsList's size is %s", tagWithTodoCountsList.size());
+            return tagWithTodoCountsList;
           }
         });
   }

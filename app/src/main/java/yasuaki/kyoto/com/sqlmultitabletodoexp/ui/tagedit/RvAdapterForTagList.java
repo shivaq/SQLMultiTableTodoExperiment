@@ -23,6 +23,7 @@ import yasuaki.kyoto.com.sqlmultitabletodoexp.ui.tagedit.RvAdapterForTagList.Tag
 public class RvAdapterForTagList extends RecyclerView.Adapter<TagListViewHolder>{
 
   private static List<Tag> tagList;
+  private static List<Long> tagCountList;
 
   @Inject
   RvAdapterForTagList(){
@@ -43,6 +44,15 @@ public class RvAdapterForTagList extends RecyclerView.Adapter<TagListViewHolder>
     String tagStr = tag.tag();
     holder.tvTagName.setText(tagStr);
 
+    long tagCount = tagCountList.get(position);
+    String todoForThisTagNum;
+    if (tagCount > 1) {
+      todoForThisTagNum = tagCount + " todos";
+    } else {
+      todoForThisTagNum = tagCount + " todo";
+    }
+    holder.tvTagCounter.setText(todoForThisTagNum);
+
     holder.lmItemContainer.setOnClickListener(new OnClickListener() {
       @Override
       public void onClick(View v) {
@@ -59,6 +69,10 @@ public class RvAdapterForTagList extends RecyclerView.Adapter<TagListViewHolder>
   /**************************************************************/
   public void setTagList(List<Tag> tagList){
     RvAdapterForTagList.tagList = tagList;
+  }
+
+  public void setTagCountList(List<Long> tagCountList) {
+    RvAdapterForTagList.tagCountList = tagCountList;
   }
 
   /**************************************************************/

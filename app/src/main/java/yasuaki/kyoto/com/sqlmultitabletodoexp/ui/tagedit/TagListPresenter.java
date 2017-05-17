@@ -10,6 +10,7 @@ import rx.schedulers.Schedulers;
 import rx.subscriptions.CompositeSubscription;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.DataManager;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Tag;
+import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Tag.TagWithTodoCounts;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.ui.base.BasePresenter;
 
 /**
@@ -62,5 +63,31 @@ public class TagListPresenter implements BasePresenter<TagListMvpView> {
           }
         })
     );
+  }
+
+  public void loadTagWithTodoCounts() {
+    subscription.add(
+        dataManager.loadTagWithTodoCounts()
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
+        .subscribe(new Subscriber<List<TagWithTodoCounts>>(){
+
+          @Override
+          public void onCompleted() {
+
+          }
+
+          @Override
+          public void onError(Throwable e) {
+
+          }
+
+          @Override
+          public void onNext(List<TagWithTodoCounts> tagWithTodoCounts) {
+            tagListMvpView.setTagWithTodoCounts(tagWithTodoCounts);
+          }
+        })
+    );
+
   }
 }

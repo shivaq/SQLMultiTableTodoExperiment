@@ -2,6 +2,7 @@ CREATE TABLE tag(
   _id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   tag TEXT NOT NULL,
   registerd_date INTEGER NOT NULL
+
 );
 
 insert_tag:
@@ -26,3 +27,16 @@ select_tag_by_id:
 SELECT *
 FROM tag
 WHERE _id = ?;
+
+/**
+ * "ORDER BY tag_count" doesn't work because of a bug.
+ * use rawQuery to accomplish that.
+ *
+ * https://github.com/square/sqldelight/issues/542
+ * Columns computed in projection cant be used in ORDER BY #542
+ */
+select_all_with_todo_counts:
+SELECT * , COUNT(todo_tag._id) AS tag_count
+FROM tag LEFT OUTER JOIN todo_tag ON tag._id = todo_tag.tag_id
+GROUP BY tag
+ORDER BY tag ASC;

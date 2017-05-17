@@ -6,11 +6,13 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.RecyclerView.LayoutManager;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.R;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.RvItemDecorator;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Tag;
+import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Tag.TagWithTodoCounts;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.ui.base.BaseActivity;
 
 public class TagListActivity  extends BaseActivity implements TagListMvpView{
@@ -33,7 +35,9 @@ public class TagListActivity  extends BaseActivity implements TagListMvpView{
     getActivityComponent().inject(this);
 
     tagListPresenter.onAttachMvpView(this);
-    tagListPresenter.loadTagList();
+//    tagListPresenter.loadTagList();
+    tagListPresenter.loadTagWithTodoCounts();
+
 
     rvLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
     rvEditTag.setLayoutManager(rvLayoutManager);
@@ -45,6 +49,19 @@ public class TagListActivity  extends BaseActivity implements TagListMvpView{
   @Override
   public void setTagList(List<Tag> tags) {
     rvAdapterForTagList.setTagList(tags);
+    rvEditTag.setAdapter(rvAdapterForTagList);
+  }
+
+  @Override
+  public void setTagWithTodoCounts(List<TagWithTodoCounts> tagWithTodoCounts) {
+    List<Tag> tagList = new ArrayList();
+    List<Long> tagCountsList = new ArrayList();
+    for(TagWithTodoCounts tagWithCounts: tagWithTodoCounts){
+      tagList.add(tagWithCounts.tag());
+      tagCountsList.add(tagWithCounts.tag_count());
+    }
+    rvAdapterForTagList.setTagList(tagList);
+    rvAdapterForTagList.setTagCountList(tagCountsList);
     rvEditTag.setAdapter(rvAdapterForTagList);
   }
 }
