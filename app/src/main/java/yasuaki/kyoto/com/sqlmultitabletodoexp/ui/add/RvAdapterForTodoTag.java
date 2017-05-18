@@ -3,7 +3,6 @@ package yasuaki.kyoto.com.sqlmultitabletodoexp.ui.add;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
 import android.widget.CompoundButton;
@@ -49,6 +48,7 @@ public class RvAdapterForTodoTag extends RecyclerView.Adapter<TagRvViewHolder> {
 
     CheckBox tagCB = holder.tagCB;
     holder.tagTv.setText(plainTagStr);
+    Timber.d("RvAdapterForTodoTag:onBindViewHolder:zzz checkedTagIdList size is %s, tag is %s", checkedTagIdList.size(), plainTag);
 
     if (checkedTagIdList != null && checkedTagIdList.contains(plainTagId)) {
       tagCB.setChecked(true);
@@ -61,28 +61,17 @@ public class RvAdapterForTodoTag extends RecyclerView.Adapter<TagRvViewHolder> {
         if (isChecked) {
           checkedTagIdList.add(plainTagId);
           isCBModified = true;
+          Timber.d("RvAdapterForTodoTag:onCheckedChanged: tagId %s is checked %s, is modified %s", plainTagId, isChecked, isCBModified);
         } else {
           checkedTagIdList.remove(plainTagId);
           isCBModified = true;
-        }
-      }
-    });
-    // Listener for RvItem CheckBox にセットしていないと、クリック後の処理がなされない
-    holder.rvItemContainer.setOnClickListener(new OnClickListener() {
-      @Override
-      public void onClick(View v) {
-        if (tagCB.isChecked()) {
-          checkedTagIdList.remove(plainTagId);
-          isCBModified = true;
-          tagCB.setChecked(false);
-        } else {
-          checkedTagIdList.add(plainTagId);
-          isCBModified = true;
-          tagCB.setChecked(true);
+          Timber.d("RvAdapterForTodoTag:onCheckedChanged: tagId %s is checked %s, is modified %s", plainTagId, isChecked, isCBModified);
         }
       }
     });
   }
+
+
 
   @Override
   public int getItemCount() {
@@ -105,6 +94,9 @@ public class RvAdapterForTodoTag extends RecyclerView.Adapter<TagRvViewHolder> {
     }
     return checkedTagIdList;
   }
+
+
+
 
   /**************************************************************/
   class TagRvViewHolder extends RecyclerView.ViewHolder {
