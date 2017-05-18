@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.ImageView;
 import android.widget.TextView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -137,8 +136,6 @@ public class MainRvAdapter extends RecyclerView.Adapter<MainRvViewHolder> {
     CheckBox cbTodo;
     @BindView(R.id.todo_main)
     TextView txtTodo;
-    @BindView(R.id.tag_add_main)
-    ImageView imgTagAdd;
     @BindView(R.id.txt_tag_list_main)
     TextView txtTagsForTodo;
 

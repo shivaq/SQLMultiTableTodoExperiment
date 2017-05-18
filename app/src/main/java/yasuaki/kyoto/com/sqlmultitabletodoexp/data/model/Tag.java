@@ -19,6 +19,8 @@ public abstract class Tag implements TagModel, Parcelable{
   public static final RowMapper<TagWithTodoCounts> TAGWITHTODOCOUNTS_ROW_MAPPER =
       TAG_FACTORY.select_all_with_todo_countsMapper((AutoValue_Tag_TagWithTodoCounts::new),TodoTag.TODO_TAG_FACTORY);
 
+  public static final RowMapper<Long> TAG_ID_FOR_TODO_MAPPER = TAG_FACTORY.select_tag_for_todo_idMapper();
+
   @AutoValue
   public static abstract class TagWithTodoCounts implements Select_all_with_todo_countsModel<Tag, TodoTag>{
 

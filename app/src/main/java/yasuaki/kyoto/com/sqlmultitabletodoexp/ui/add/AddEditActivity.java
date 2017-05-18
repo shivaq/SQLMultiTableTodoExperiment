@@ -1,5 +1,6 @@
 package yasuaki.kyoto.com.sqlmultitabletodoexp.ui.add;
 
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -15,6 +16,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -70,9 +72,6 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
     editTag.setOnTouchListener(touchListener);
 
     addEditPresenter.onAttachMvpView(this);
-    addEditPresenter.loadPlainTag();
-
-
 
     // Edit モードか 新規追加モードかをチェック
     Intent intentFromMain = getIntent();
@@ -90,20 +89,27 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
       long todoEditId = todoFromMain._id();
       // TodoId と紐付いたタグを取得する
       Timber.d("AddEditActivity:onCreate: todoEditId is %s", todoEditId);
-      addEditPresenter.loadTodoTag(todoEditId);
+      addEditPresenter.loadTagForTodo(todoEditId);
     }
 
     rvLayoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
     rvTag.setLayoutManager(rvLayoutManager);
     rvTag.setHasFixedSize(true);
     rvTag.addItemDecoration(new RvItemDecorator(this));
-    rvTag.setAdapter(rvAdapterForTodoTag);
+
+    rvTag.setOnTouchListener(new OnTouchListener() {
+      @Override
+      public boolean onTouch(View v, MotionEvent event) {
+          InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+          imm.hideSoftInputFromWindow(v.getWindowToken(), 0);
+        return false;
+      }
+    });
   }
 
   @Override
   protected void onResume() {
     super.onResume();
-    Timber.d("AddEditActivity:onResume: ");
     addEditPresenter.loadPlainTag();
   }
 
@@ -154,6 +160,28 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
     return super.onOptionsItemSelected(item);
   }
 
+
+  @Override
+  public void onBackPressed() {
+    // If the pet hasn't changed, continue with handling back button press
+    if (!isDataModified) {
+      super.onBackPressed();
+      return;
+    }
+
+    // Create a click listener to handle the user confirming that changes should be discarded.
+    DialogInterface.OnClickListener discardButtonClickListener =
+        new DialogInterface.OnClickListener() {
+          @Override
+          public void onClick(DialogInterface dialogInterface, int i) {
+            // User clicked "Discard" button, close the current activity.
+            finish();
+          }
+        };
+
+    // Show dialog that there are unsaved changes
+    showUnsavedChangesDialog(discardButtonClickListener);
+  }
   /**********************************************************/
 
 
@@ -178,14 +206,12 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
   }
 
   @Override
-  public void setTodoWithCheckedTag(List<Long> checkedTagIdList) {
+  public void setTodoWithCheckedTag(List<Long> checkedTagIdForTodoList) {
     // Todoに紐付いたタグを取得してきてここに至る
     fromMainTodoString = todoFromMain.todo();
 
-//    checkedTagIdListBeforeEdit = checkedTagIdList;
-//    Timber.d("AddEditActivity:setTodoWithCheckedTag: checkedTagIdListBeforeEdit is %s", checkedTagIdListBeforeEdit);
     // Todoに紐付いたタグをAdapter に渡す
-    rvAdapterForTodoTag.setCheckedTagList(checkedTagIdList);
+    rvAdapterForTodoTag.setCheckedTagIdForTodoList(checkedTagIdForTodoList);
     editTodo.setText(fromMainTodoString);
   }
 
@@ -255,28 +281,6 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
     alertDialog.show();
   }
 
-  @Override
-  public void onBackPressed() {
-    // If the pet hasn't changed, continue with handling back button press
-    if (!isDataModified) {
-      super.onBackPressed();
-      return;
-    }
-
-    // Create a click listener to handle the user confirming that changes should be discarded.
-    DialogInterface.OnClickListener discardButtonClickListener =
-        new DialogInterface.OnClickListener() {
-          @Override
-          public void onClick(DialogInterface dialogInterface, int i) {
-            // User clicked "Discard" button, close the current activity.
-            finish();
-          }
-        };
-
-    // Show dialog that there are unsaved changes
-    showUnsavedChangesDialog(discardButtonClickListener);
-  }
-
 
   /*********************** onClick ************************/
   @OnClick(R.id.fab_todo_edit_ok)
@@ -284,8 +288,12 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
     String addedTodoStr = editTodo.getText().toString();
     String addedTagStr = editTag.getText().toString();
 
-    List<Long> checkedTagIdList = rvAdapterForTodoTag.getCheckedTagIdList();
-    boolean cbIsModified = false;
+    boolean isTodoChanged = false;
+    if (!addedTodoStr.equals(fromMainTodoString)) {
+      isTodoChanged = true;
+    }
+
+    List<Long> checkedTagIdList = rvAdapterForTodoTag.getCheckedTagIdForTodoList();
 
     // TODOが未入力かどうか
     if (addedTodoStr.length() == 0) {
@@ -295,30 +303,29 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
 
     // 新規入力タグが既存のタグと一致するかどうかチェック
     if (addedTagStr.length() != 0) {
-      for(Tag addedTag: plainTagList){
-        if(addedTag.tag().equals(addedTagStr)){
+      for (Tag existedTag : plainTagList) {
+        if (existedTag.tag().equals(addedTagStr)) {
           if (checkedTagIdList == null) {
-            checkedTagIdList = new ArrayList<>();
+            checkedTagIdList = new ArrayList();
           }
-          long tagId = addedTag._id();
-          checkedTagIdList.add(tagId);
+          // 既存のTag がチェックされたとして登録
+          checkedTagIdList.add(existedTag._id());
+          // 追加タグ 文字列を空にする
           addedTagStr = "";
         }
       }
     }
 
-    if (checkedTagIdList != null) {
-      cbIsModified = true;
-    }
 
     if (isEditMode) {
       // TodoString に変更はあるか && 新規タグが記載されたか && CheckBox の状態に変更はあるか
-      if (addedTodoStr.equals(fromMainTodoString) && addedTagStr.length() == 0 && !cbIsModified) {
+      if (!isTodoChanged && addedTagStr.length() == 0
+          && checkedTagIdList == null) {
         closeActivity();
         return;
       }
       long modifiedTodoId = todoFromMain._id();
-      addEditPresenter.updateTodo(addedTodoStr, addedTagStr, modifiedTodoId, checkedTagIdList);
+      addEditPresenter.updateTodo(addedTodoStr, isTodoChanged, addedTagStr, modifiedTodoId, checkedTagIdList);
     } else {
       addEditPresenter.saveTodo(addedTodoStr, addedTagStr, checkedTagIdList);
     }

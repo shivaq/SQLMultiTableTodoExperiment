@@ -13,7 +13,6 @@ import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Tag;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Tag.TagWithTodoCounts;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Todo;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Todo.TodoForTag;
-import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.TodoTag;
 
 /**
  * リモート、ローカル、プレファレンス、Service と、
@@ -41,6 +40,7 @@ public class DataManager {
             try {
               if (cursor.moveToFirst()) {
                 for (int i = 0; i < cursor.getCount(); i++) {
+                  // cursor を todoに map する
                   Todo allTodo = Todo.SELECT_ALL_MAPPER.map(cursor);
                   todoList.add(allTodo);
                   cursor.moveToNext();
@@ -61,7 +61,6 @@ public class DataManager {
 
           @Override
           public List<Tag> call(Cursor cursor) {
-            Timber.d("DataManager:call: cursor size is %s", cursor.getCount());
             List<Tag> tagList = new ArrayList<>();
             try {
               if (cursor.moveToFirst()) {
@@ -79,18 +78,18 @@ public class DataManager {
         });
   }
 
-  public Observable<List<Long>> loadTodoTag(long todoId) {
-    return dbCrudHelper.loadTodoTag(todoId)
+  public Observable<List<Long>> loadTagForTodo(long todoId) {
+    return dbCrudHelper.loadTagForTodo(todoId)
         .map(new Func1<Cursor, List<Long>>() {
 
           @Override
           public List<Long> call(Cursor cursor) {
-            List<Long> tagList = new ArrayList();
+            List<Long> tagIdForTodoList = new ArrayList();
             try {
               if (cursor.moveToFirst()) {
                 for (int i = 0; i < cursor.getCount(); i++) {
-                  TodoTag todoTag = TodoTag.TAG_FOR_TODO_ROW_MAPPER.map(cursor);
-                  tagList.add(todoTag.tag_id());
+                  long tagId = Tag.TAG_ID_FOR_TODO_MAPPER.map(cursor);
+                  tagIdForTodoList.add(tagId);
 
                   cursor.moveToNext();
                 }
@@ -98,7 +97,7 @@ public class DataManager {
             } finally {
               cursor.close();
             }
-            return tagList;
+            return tagIdForTodoList;
           }
         });
   }
@@ -110,7 +109,6 @@ public class DataManager {
           @Override
           public List<TodoForTag> call(Cursor cursor) {
             List<TodoForTag> todoForTagList = new ArrayList();
-            Timber.d("DataManager:call: cursor size is %s", cursor.getCount());
             try{
               if(cursor.moveToFirst()){
                 for(int i = 0; i < cursor.getCount(); i++){
@@ -146,28 +144,22 @@ public class DataManager {
             }finally{
               cursor.close();
             }
-            Timber.d("DataManager:call: tagWithTodoCountsList's size is %s", tagWithTodoCountsList.size());
             return tagWithTodoCountsList;
           }
         });
   }
 
   public void insertTodo(String todo, String addedTag, List<Long> checkedTagList) {
-    Timber.d("DataManager:insertTodo: ");
     dbCrudHelper.insertTodo(todo, addedTag, checkedTagList);
-  }
-
-  public void insertTag(String addedTag) {
-    dbCrudHelper.insertTag(addedTag);
   }
 
   public void updateTodoIsChecked(boolean isChecked, long id) {
     dbCrudHelper.updateTodoIsChecked(isChecked, id);
   }
 
-  public void updateTodo(String addedTodo, String addedTagStr, long todoId,
+  public void updateTodo(String addedTodo, boolean isTodoChanged,String addedTagStr, long todoId,
       List<Long> checkedTagIdList) {
-    dbCrudHelper.updateTodoString(addedTodo, addedTagStr, todoId, checkedTagIdList);
+    dbCrudHelper.updateTodoString(addedTodo, isTodoChanged,addedTagStr, todoId, checkedTagIdList);
   }
 
   public int deleteTodo(long todoId) {

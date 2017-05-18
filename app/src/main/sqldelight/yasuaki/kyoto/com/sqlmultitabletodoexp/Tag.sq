@@ -40,3 +40,8 @@ SELECT * , COUNT(todo_tag._id) AS tag_count
 FROM tag LEFT OUTER JOIN todo_tag ON tag._id = todo_tag.tag_id
 GROUP BY tag
 ORDER BY tag ASC;
+
+select_tag_for_todo_id:
+SELECT tag._id
+FROM tag LEFT OUTER JOIN todo_tag ON tag._id = todo_tag.tag_id
+WHERE todo_tag.todo_id = ?;

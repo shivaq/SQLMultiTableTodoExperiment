@@ -28,14 +28,6 @@ delete_todo:
 DELETE FROM todo
 WHERE _id = ?;
 
---select_todo_for_tag:
---SELECT *
---FROM todo
---WHERE _id = (
---    SELECT *
---    FROM todo_tag
---    WHERE tag_id = ?);
-
 select_todo_by_id:
 SELECT *
 FROM todo

@@ -14,5 +14,5 @@ public interface AddEditMvpView extends BaseMvpView{
 
   void setPlainTagList(List<Tag> tags);
 
-  void setTodoWithCheckedTag(List<Long> tagIdList);
+  void setTodoWithCheckedTag(List<Long> tagIdForTodoList);
 }

@@ -33,7 +33,8 @@
         android:name="android.support.PARENT_ACTIVITY"
         android:value=".ui.main.MainActivity"/>
     </activity>
-    <activity android:name=".ui.tagdetail.TagDetailActivity">
+    <activity android:name=".ui.tagdetail.TagDetailActivity"
+      android:parentActivityName=".ui.taglist.TagListActivity">
     </activity>
   </application>
 

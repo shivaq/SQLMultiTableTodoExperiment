@@ -3,10 +3,9 @@ package yasuaki.kyoto.com.sqlmultitabletodoexp.ui.add;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.CheckBox;
-import android.widget.CompoundButton;
-import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import butterknife.BindView;
@@ -14,7 +13,6 @@ import butterknife.ButterKnife;
 import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
-import timber.log.Timber;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.R;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Tag;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.ui.add.RvAdapterForTodoTag.TagRvViewHolder;
@@ -22,14 +20,14 @@ import yasuaki.kyoto.com.sqlmultitabletodoexp.ui.add.RvAdapterForTodoTag.TagRvVi
 
 public class RvAdapterForTodoTag extends RecyclerView.Adapter<TagRvViewHolder> {
 
-  private static List<Tag> plainTagList;
-  private static List<Long> checkedTagIdList;
+  private List<Tag> plainTagList;
+  private List<Long> checkedTagIdForTodoList;
   private static boolean isCBModified;
 
   @Inject
   RvAdapterForTodoTag() {
     plainTagList = new ArrayList<>();
-    checkedTagIdList = new ArrayList<>();
+    checkedTagIdForTodoList = new ArrayList<>();
   }
 
   @Override
@@ -42,35 +40,36 @@ public class RvAdapterForTodoTag extends RecyclerView.Adapter<TagRvViewHolder> {
   @Override
   public void onBindViewHolder(TagRvViewHolder holder, int position) {
 
+    // このアイテムポジションに対応する、タグリストを取得
     Tag plainTag = plainTagList.get(position);
     String plainTagStr = plainTag.tag();
     long plainTagId = plainTag._id();
 
     CheckBox tagCB = holder.tagCB;
     holder.tagTv.setText(plainTagStr);
-    Timber.d("RvAdapterForTodoTag:onBindViewHolder:zzz checkedTagIdList size is %s, tag is %s", checkedTagIdList.size(), plainTag);
 
-    if (checkedTagIdList != null && checkedTagIdList.contains(plainTagId)) {
+    // チェック状態のタグリストに、このアイテムポジションに対応する、タグがあれば true
+    if (checkedTagIdForTodoList != null && checkedTagIdForTodoList.contains(plainTagId)) {
+      // ソフトウェアキーボードを閉じても、未チェック CB がチェックされてしまう現象がおきる
+      // 最悪の場合、リンクテーブルに isChecked 列を入れる（Main の todoList みたいに）
       tagCB.setChecked(true);
     }
 
     // Listener for CheckBox
-    tagCB.setOnCheckedChangeListener(new OnCheckedChangeListener() {
+    tagCB.setOnClickListener(new OnClickListener() {
       @Override
-      public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-        if (isChecked) {
-          checkedTagIdList.add(plainTagId);
+      public void onClick(View v) {
+        if (tagCB.isChecked()) {
+
+          checkedTagIdForTodoList.add(plainTagId);
           isCBModified = true;
-          Timber.d("RvAdapterForTodoTag:onCheckedChanged: tagId %s is checked %s, is modified %s", plainTagId, isChecked, isCBModified);
         } else {
-          checkedTagIdList.remove(plainTagId);
+          checkedTagIdForTodoList.remove(plainTagId);
           isCBModified = true;
-          Timber.d("RvAdapterForTodoTag:onCheckedChanged: tagId %s is checked %s, is modified %s", plainTagId, isChecked, isCBModified);
         }
       }
     });
   }
-
 
 
   @Override
@@ -80,22 +79,19 @@ public class RvAdapterForTodoTag extends RecyclerView.Adapter<TagRvViewHolder> {
 
   /**************************************************************/
   public void setPlainTagList(List<Tag> tagList) {
-    RvAdapterForTodoTag.plainTagList = tagList;
+    this.plainTagList = tagList;
   }
 
-  public void setCheckedTagList(List<Long> checkedTagIdList) {
-    RvAdapterForTodoTag.checkedTagIdList = checkedTagIdList;
-    Timber.d("RvAdapterForTodoTag:setCheckedTagList: TagId");
+  public void setCheckedTagIdForTodoList(List<Long> checkedTagIdForTodoList) {
+    this.checkedTagIdForTodoList = checkedTagIdForTodoList;
   }
 
-  public List<Long> getCheckedTagIdList() {
+  public List<Long> getCheckedTagIdForTodoList() {
     if (!isCBModified) {
-      checkedTagIdList = null;
+      checkedTagIdForTodoList = null;
     }
-    return checkedTagIdList;
+    return checkedTagIdForTodoList;
   }
-
-
 
 
   /**************************************************************/
