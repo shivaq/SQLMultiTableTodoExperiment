@@ -27,7 +27,9 @@ import yasuaki.kyoto.com.sqlmultitabletodoexp.TodoModel.Update_todoString;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.Todo_TagModel.Delete_todo_by_todo_id;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.Todo_TagModel.Insert_todo_tag;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Tag;
+import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Tag.TagWithTodoCounts;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Todo;
+import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Todo.TodoForTag;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.TodoTag;
 
 @Singleton
@@ -105,7 +107,7 @@ public class DbCrudHelper {
 
 
   // Parse cursor in DataManager version
-  public Observable<Cursor> loadTag() {
+  public Observable<List<Tag>> loadTag() {
     SqlDelightStatement selectAllTagQuery = TAG_FACTORY.select_all();
     return briteDatabase.createQuery(
         Tag.TABLE_NAME,
@@ -116,10 +118,28 @@ public class DbCrudHelper {
           public Cursor call(Query query) {
             return query.run();
           }
+        }).map(new Func1<Cursor, List<Tag>>() {
+
+          @Override
+          public List<Tag> call(Cursor cursor) {
+            List<Tag> tagList = new ArrayList<>();
+            try {
+              if (cursor.moveToFirst()) {
+                for (int i = 0; i < cursor.getCount(); i++) {
+                  Tag tag = Tag.TAG_ROW_MAPPER.map(cursor);
+                  tagList.add(tag);
+                  cursor.moveToNext();
+                }
+              }
+            } finally {
+              cursor.close();
+            }
+            return tagList;
+          }
         });
   }
 
-  public Observable<Cursor> loadTagForTodo(long todoId) {
+  public Observable<List<Long>> loadTagForTodo(long todoId) {
     SqlDelightStatement selectTagsForTodoId =
         Tag.TAG_FACTORY.select_tag_for_todo_id(todoId);
     return briteDatabase.createQuery(
@@ -129,10 +149,30 @@ public class DbCrudHelper {
           public Cursor call(Query query) {
             return query.run();
           }
+        })
+        .map(new Func1<Cursor, List<Long>>() {
+
+          @Override
+          public List<Long> call(Cursor cursor) {
+            List<Long> tagIdForTodoList = new ArrayList();
+            try {
+              if (cursor.moveToFirst()) {
+                for (int i = 0; i < cursor.getCount(); i++) {
+                  long tagId = Tag.TAG_ID_FOR_TODO_MAPPER.map(cursor);
+                  tagIdForTodoList.add(tagId);
+
+                  cursor.moveToNext();
+                }
+              }
+            } finally {
+              cursor.close();
+            }
+            return tagIdForTodoList;
+          }
         });
   }
 
-  public Observable<Cursor> loadTodoForTag(long tagId) {
+  public Observable<List<TodoForTag>> loadTodoForTag(long tagId) {
     SqlDelightStatement selectTodosForTag =
         Todo.TODO_FACTORY.select_todo_for_tag(tagId);
     return briteDatabase.createQuery(
@@ -144,10 +184,30 @@ public class DbCrudHelper {
           public Cursor call(Query query) {
             return query.run();
           }
+        })
+        .map(new Func1<Cursor, List<TodoForTag>>(){
+
+          @Override
+          public List<TodoForTag> call(Cursor cursor) {
+            List<TodoForTag> todoForTagList = new ArrayList();
+            try{
+              if(cursor.moveToFirst()){
+                for(int i = 0; i < cursor.getCount(); i++){
+
+                  TodoForTag todoForTag = Todo.SELECT_TODO_FOR_TAG_MAPPER.map(cursor);
+                  todoForTagList.add(todoForTag);
+                  cursor.moveToNext();
+                }
+              }
+            } finally{
+              cursor.close();
+            }
+            return todoForTagList;
+          }
         });
   }
 
-  public Observable<Cursor> loadTagWithTodoCounts() {
+  public Observable<List<TagWithTodoCounts>> loadTagWithTodoCounts() {
     SqlDelightStatement selectAllTagWithCounts = TAG_FACTORY.select_all_with_todo_counts();
 
     // COUNT 順 に対応する 手打ちステートメント
@@ -165,7 +225,26 @@ public class DbCrudHelper {
                  return query.run();
                }
              }
-        );
+        )
+        .map(new Func1<Cursor, List<TagWithTodoCounts>>(){
+
+          @Override
+          public List<TagWithTodoCounts> call(Cursor cursor) {
+            List<TagWithTodoCounts> tagWithTodoCountsList = new ArrayList();
+            try{
+              if(cursor.moveToFirst()){
+                for(int i = 0; i < cursor.getCount(); i++){
+                  TagWithTodoCounts tagWithTodoCounts = Tag.TAGWITHTODOCOUNTS_ROW_MAPPER.map(cursor);
+                  tagWithTodoCountsList.add(tagWithTodoCounts);
+                  cursor.moveToNext();
+                }
+              }
+            }finally{
+              cursor.close();
+            }
+            return tagWithTodoCountsList;
+          }
+        });
   }
 
   /***************************** insert **********************************************/
