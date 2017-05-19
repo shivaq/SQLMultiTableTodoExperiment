@@ -14,6 +14,8 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import rx.Observable;
+import rx.Observable.OnSubscribe;
+import rx.Subscriber;
 import rx.functions.Func1;
 import rx.schedulers.Schedulers;
 import timber.log.Timber;
@@ -68,11 +70,13 @@ public class DbCrudHelper {
   }
 
   /***************************** load **********************************************/
-  public Observable<Cursor> loadTodo() {
+
+  // Parse cursor here version
+  public Observable<List<Todo>> loadTodo() {
     // SqlDelight が生成した SQL ステートメント
     SqlDelightStatement selectAllTodoQuery = Todo.TODO_FACTORY.select_all();
 
-    // 返り値は QueryObservable
+    // query -> cursor -> todoList
     return briteDatabase.createQuery(
         Todo.TABLE_NAME,
         selectAllTodoQuery.statement,
@@ -82,9 +86,25 @@ public class DbCrudHelper {
           public Cursor call(Query query) {
             return query.run();
           }
+        })
+        .map(new Func1<Cursor, List<Todo>>() {
+
+          @Override
+          public List<Todo> call(Cursor cursor) {
+            List<Todo> todoList = new ArrayList<>();
+            if (cursor.moveToFirst()) {
+              while (cursor.moveToNext()) {
+                Todo allTodo = Todo.SELECT_ALL_MAPPER.map(cursor);
+                todoList.add(allTodo);
+              }
+            }
+            return todoList;
+          }
         });
   }
 
+
+  // Parse cursor in DataManager version
   public Observable<Cursor> loadTag() {
     SqlDelightStatement selectAllTagQuery = TAG_FACTORY.select_all();
     return briteDatabase.createQuery(
@@ -157,7 +177,8 @@ public class DbCrudHelper {
     // Todoテーブル にInsert
     insertTodo.bind(todoStr, false, now, now);
     long newTodoId = briteDatabase.executeInsert(insertTodo.table, insertTodo.program);
-    Timber.d("DbCrudHelper:insertTodo: Id_%s: %s is inserted into todo table", newTodoId, todoStr);
+    Timber.d("DbCrudHelper:insertTodo: Id_%s: %s is inserted into todo table", newTodoId,
+        todoStr);
 //
 //    // 新規挿入時に、タグも追加されているかどうか
 //    if (addedTagStr.length() != 0) {
@@ -188,7 +209,8 @@ public class DbCrudHelper {
   }
 
   /***************************** update **********************************************/
-  public void updateTodoString(String addedTodoStr, boolean isTodoChanged, String addedTagStr,
+  public void updateTodoString(String addedTodoStr, boolean isTodoChanged,
+      String addedTagStr,
       long todoId,
       List<Long> checkedTagIdList) {
 
@@ -211,12 +233,14 @@ public class DbCrudHelper {
       // タグテーブルにInsert
       long newTagId = insertTag(addedTagStr);
 
-      Timber.d("DbCrudHelper:addNewTag: id %s %s is inserted to tag table", newTagId, addedTagStr);
+      Timber.d("DbCrudHelper:addNewTag: id %s %s is inserted to tag table", newTagId,
+          addedTagStr);
 
       if (checkedTagIdList == null) {
         // 他に追加タグがないので、ここで リンクテーブルを更新
         insertTodoTag.bind(todoId, newTagId);
-        long todoTagId = briteDatabase.executeInsert(insertTodoTag.table, insertTodoTag.program);
+        long todoTagId = briteDatabase
+            .executeInsert(insertTodoTag.table, insertTodoTag.program);
         Timber.d("DbCrudHelper:addNewTag: %s rows are inserted", todoTagId);
       } else {
         if (checkedTagIdList == null) {
@@ -247,13 +271,15 @@ public class DbCrudHelper {
         briteDatabase.executeInsert(insertTodoTag.table, insertTodoTag.program);
         insertCount++;
       }
-      Timber.d("DbCrudHelper:updateTodoString: %s rows are inserted to linkTable", insertCount);
+      Timber.d("DbCrudHelper:updateTodoString: %s rows are inserted to linkTable",
+          insertCount);
     }
   }
 
   public void updateTodoIsChecked(boolean isTodoChecked, long todoId) {
     updateTodoIsChecked.bind(isTodoChecked, todoId);
-    briteDatabase.executeUpdateDelete(updateTodoIsChecked.table, updateTodoIsChecked.program);
+    briteDatabase
+        .executeUpdateDelete(updateTodoIsChecked.table, updateTodoIsChecked.program);
   }
 
   /***************************** delete **********************************************/
@@ -264,5 +290,29 @@ public class DbCrudHelper {
         .executeUpdateDelete(deleteTodoByTodoId.table, deleteTodoByTodoId.program);
     deleteTodo.bind(todoId);
     return briteDatabase.executeUpdateDelete(deleteTodo.table, deleteTodo.program);
+  }
+
+  // すべてのテーブルを delete する。
+  public Observable<Void> clearTables() {
+    return Observable.create(new OnSubscribe<Void>() {
+      @Override
+      public void call(Subscriber<? super Void> subscriber) {
+        BriteDatabase.Transaction transaction = briteDatabase.newTransaction();
+        try {
+          // sqlite_master は、すべての Sqlite DB が持つ、DB スキーマを定義した特別なテーブル
+          Cursor cursor = briteDatabase
+              .query("SELECT name FROM sqlite_master WHERE type='table'");
+          while (cursor.moveToNext()) {
+            // $1 テーブル名が格納された列からテーブル名をことごとく取得 $2:Where 句 が null →全部削除となるのかな。
+            briteDatabase.delete(cursor.getString(cursor.getColumnIndex("name")), null);
+          }
+          cursor.close();
+          transaction.markSuccessful();
+          subscriber.onCompleted();
+        } finally {
+          transaction.end();
+        }
+      }
+    });
   }
 }

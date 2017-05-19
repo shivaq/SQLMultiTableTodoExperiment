@@ -16,7 +16,7 @@ import yasuaki.kyoto.com.sqlmultitabletodoexp.di.ApplicationContext;
 public class DbOpenHelper extends SQLiteOpenHelper implements SQLiteTransactionListener {
 
   public static final int DATABASE_VERSION = 16;
-  private static final String DATABASE_NAME = "todo.db";
+  public static final String DATABASE_NAME = "todo.db";
 
   @Inject
   public DbOpenHelper(@ApplicationContext Context context) {

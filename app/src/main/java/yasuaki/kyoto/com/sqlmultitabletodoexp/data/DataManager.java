@@ -29,29 +29,7 @@ public class DataManager {
   }
 
   public Observable<List<Todo>> loadTodo() {
-
-    return dbCrudHelper.loadTodo()
-        // カーソルを、List に変換する
-        // map →Observable が emit した各アイテムに、function を適用していく
-        .map(new Func1<Cursor, List<Todo>>() {
-          @Override
-          public List<Todo> call(Cursor cursor) {
-            List<Todo> todoList = new ArrayList<>();
-            try {
-              if (cursor.moveToFirst()) {
-                for (int i = 0; i < cursor.getCount(); i++) {
-                  // cursor を todoに map する
-                  Todo allTodo = Todo.SELECT_ALL_MAPPER.map(cursor);
-                  todoList.add(allTodo);
-                  cursor.moveToNext();
-                }
-              }
-            } finally {
-              cursor.close();
-            }
-            return todoList;
-          }
-        });
+    return dbCrudHelper.loadTodo();
   }
 
   public Observable<List<Tag>> loadTag() {
