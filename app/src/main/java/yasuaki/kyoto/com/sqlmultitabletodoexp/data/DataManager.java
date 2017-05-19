@@ -39,7 +39,7 @@ public class DataManager {
   }
 
   public Observable<List<TodoForTag>> loadTodoForTag(long tagId) {
-    return dbCrudHelper.loadTodoForTag(tagId) ;
+    return dbCrudHelper.loadTodoForTag(tagId);
   }
 
   public Observable<List<TagWithTodoCounts>> loadTagWithTodoCounts() {
@@ -54,15 +54,14 @@ public class DataManager {
     dbCrudHelper.updateTodoIsChecked(isChecked, id);
   }
 
-  public void updateTodo(String addedTodo, boolean isTodoChanged,String addedTagStr, long todoId,
-      List<Long> checkedTagIdList) {
-    dbCrudHelper.updateTodoString(addedTodo, isTodoChanged,addedTagStr, todoId, checkedTagIdList);
+  public void updateTodo(String addedTodo, boolean isTodoChanged, String addedTagStr,
+      long todoId, List<Long> checkedTagIdList) {
+    dbCrudHelper.updateTodoString(addedTodo, isTodoChanged, addedTagStr, todoId, checkedTagIdList);
   }
 
   public int deleteTodo(long todoId) {
     return dbCrudHelper.deleteTodo(todoId);
   }
-
 
 
 }
