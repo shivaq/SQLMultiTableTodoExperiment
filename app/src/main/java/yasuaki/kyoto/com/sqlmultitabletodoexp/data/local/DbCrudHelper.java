@@ -45,6 +45,8 @@ public class DbCrudHelper {
   private TodoTag.Insert_todo_tag insertTodoTag;
   private TodoTag.Delete_todo_by_todo_id deleteTodoByTodoId;
 
+  private DbOpenHelper openHelper;
+
   @Inject
   public DbCrudHelper(DbOpenHelper openHelper) {
 
@@ -56,6 +58,8 @@ public class DbCrudHelper {
 //          }
 //        })
         .build();
+
+    this.openHelper = openHelper;
 
     briteDatabase = sqlBrite.wrapDatabaseHelper(openHelper, Schedulers.io());
     SQLiteDatabase sqLiteWritableDatabase = briteDatabase.getWritableDatabase();
@@ -72,7 +76,6 @@ public class DbCrudHelper {
   }
 
   /***************************** load **********************************************/
-
   // Parse cursor here version
   public Observable<List<Todo>> loadTodo() {
     // SqlDelight が生成した SQL ステートメント
@@ -88,22 +91,27 @@ public class DbCrudHelper {
           public Cursor call(Query query) {
             return query.run();
           }
-        })
-        .map(new Func1<Cursor, List<Todo>>() {
+        }).map(new Func1<Cursor, List<Todo>>() {
 
           @Override
           public List<Todo> call(Cursor cursor) {
             List<Todo> todoList = new ArrayList<>();
-            if (cursor.moveToFirst()) {
-              while (cursor.moveToNext()) {
-                Todo allTodo = Todo.SELECT_ALL_MAPPER.map(cursor);
-                todoList.add(allTodo);
+            try {
+              if (cursor.moveToFirst()) {
+                for (int i = 0; i < cursor.getCount(); i++) {
+                  Todo allTodo = Todo.SELECT_ALL_MAPPER.map(cursor);
+                  todoList.add(allTodo);
+                  cursor.moveToNext();
+                }
               }
+            } finally {
+              cursor.close();
             }
             return todoList;
           }
         });
   }
+
 
   public Observable<List<Tag>> loadTag() {
     SqlDelightStatement selectAllTagQuery = TAG_FACTORY.select_all();
@@ -147,12 +155,11 @@ public class DbCrudHelper {
           public Cursor call(Query query) {
             return query.run();
           }
-        })
-        .map(new Func1<Cursor, List<Long>>() {
+        }).map(new Func1<Cursor, List<Long>>() {
 
           @Override
           public List<Long> call(Cursor cursor) {
-            List<Long> tagIdForTodoList = new ArrayList();
+            List<Long> tagIdForTodoList = new ArrayList<>();
             try {
               if (cursor.moveToFirst()) {
                 for (int i = 0; i < cursor.getCount(); i++) {
@@ -182,12 +189,11 @@ public class DbCrudHelper {
           public Cursor call(Query query) {
             return query.run();
           }
-        })
-        .map(new Func1<Cursor, List<TodoForTag>>() {
+        }).map(new Func1<Cursor, List<TodoForTag>>() {
 
           @Override
           public List<TodoForTag> call(Cursor cursor) {
-            List<TodoForTag> todoForTagList = new ArrayList();
+            List<TodoForTag> todoForTagList = new ArrayList<>();
             try {
               if (cursor.moveToFirst()) {
                 for (int i = 0; i < cursor.getCount(); i++) {
@@ -218,17 +224,15 @@ public class DbCrudHelper {
         Tag.TABLE_NAME, selectAllTagWithCounts.statement, selectAllTagWithCounts.args)
 //        Tag.TABLE_NAME, selectAllTagWithCountsQuery, selectAllTagWithCounts.args)
         .map(new Func1<Query, Cursor>() {
-               @Override
-               public Cursor call(Query query) {
-                 return query.run();
-               }
-             }
-        )
-        .map(new Func1<Cursor, List<TagWithTodoCounts>>() {
+          @Override
+          public Cursor call(Query query) {
+            return query.run();
+          }
+        }).map(new Func1<Cursor, List<TagWithTodoCounts>>() {
 
           @Override
           public List<TagWithTodoCounts> call(Cursor cursor) {
-            List<TagWithTodoCounts> tagWithTodoCountsList = new ArrayList();
+            List<TagWithTodoCounts> tagWithTodoCountsList = new ArrayList<>();
             try {
               if (cursor.moveToFirst()) {
                 for (int i = 0; i < cursor.getCount(); i++) {
@@ -246,9 +250,35 @@ public class DbCrudHelper {
         });
   }
 
+  public Observable<Todo> loadTodoById(long todoId) {
+    return Observable.create(new OnSubscribe<Todo>() {
+      @Override
+      public void call(Subscriber<? super Todo> subscriber) {
+        SqlDelightStatement selectTodoById = Todo.TODO_FACTORY.select_todo_by_id(todoId);
+        Cursor cursor = openHelper.getReadableDatabase().rawQuery(selectTodoById.statement,
+            selectTodoById.args);
+
+        while (cursor.moveToNext()) {
+          subscriber.onNext(parseCursor(cursor));
+        }
+        cursor.close();
+        subscriber.onCompleted();
+      }
+    });
+  }
+
+  private Todo parseCursor(Cursor cursor) {
+    Todo todo = null;
+    if (cursor.moveToFirst()) {
+      todo = Todo.SELECT_TODO_BY_ID_MAPPER.map(cursor);
+    }
+    return todo;
+  }
+
+
   /***************************** insert **********************************************/
 
-  public void insertTodo(String todoStr, String addedTagStr, List<Long> checkedTagIdList) {
+  public long insertTodo(String todoStr, String addedTagStr, List<Long> checkedTagIdList) {
     Timber.d("DbCrudHelper:insertTodo: ");
     long now = System.currentTimeMillis();
 
@@ -266,6 +296,7 @@ public class DbCrudHelper {
         updateLinkTable(newTodoId, checkedTagIdList);
       }
     }
+    return newTodoId;
   }
 
   public long insertTag(String addedTag) {
@@ -380,4 +411,5 @@ public class DbCrudHelper {
       }
     });
   }
+
 }

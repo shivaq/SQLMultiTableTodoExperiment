@@ -1,5 +1,6 @@
 package yasuaki.kyoto.com.sqlmultitabletodoexp.data;
 
+import java.util.ArrayList;
 import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -20,12 +21,22 @@ public class DataManager {
 
   private final DbCrudHelper dbCrudHelper;
 
+
+
+  List<Todo> todolisttest = new ArrayList();
+
   @Inject
   public DataManager(DbCrudHelper dbCrudHelper) {
     this.dbCrudHelper = dbCrudHelper;
   }
 
   public Observable<List<Todo>> loadTodo() {
+
+
+
+    todolisttest = dbCrudHelper.loadTodo().toBlocking().first();
+    Timber.d("DataManager:loadTodo: todolisttest has %s todos", todolisttest.size());
+
     return dbCrudHelper.loadTodo();
   }
 

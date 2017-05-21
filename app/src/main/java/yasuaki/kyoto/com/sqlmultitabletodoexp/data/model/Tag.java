@@ -9,6 +9,10 @@ import yasuaki.kyoto.com.sqlmultitabletodoexp.TagModel;
 @AutoValue
 public abstract class Tag implements TagModel, Parcelable{
 
+  public static Tag create(long _id, String tagStr, long registeredDate ){
+    return new AutoValue_Tag(_id, tagStr, registeredDate);
+  }
+
   public static final Factory<Tag> TAG_FACTORY = new Factory<>(AutoValue_Tag::new);
 
   // RowMapper →select結果をオブジェクトにして返却
