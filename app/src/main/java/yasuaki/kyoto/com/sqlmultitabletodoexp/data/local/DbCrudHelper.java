@@ -78,6 +78,7 @@ public class DbCrudHelper {
   /***************************** load **********************************************/
   // Parse cursor here version
   public Observable<List<Todo>> loadTodo() {
+    Timber.d("DbCrudHelper:loadTodo: ");
     // SqlDelight が生成した SQL ステートメント
     SqlDelightStatement selectAllTodoQuery = Todo.TODO_FACTORY.select_all();
 
@@ -293,7 +294,7 @@ public class DbCrudHelper {
   }
 
   /***************************** update **********************************************/
-  public void updateTodoString(String addedTodoStr, boolean isTodoChanged,
+  public void updateTodo(String addedTodoStr, boolean isTodoChanged,
       String addedTagStr, long todoId, List<Long> checkedTagIdList) {
 
     // TodoTable をアップデート
@@ -301,7 +302,7 @@ public class DbCrudHelper {
       updateTodoString.bind(addedTodoStr, todoId);
       int updatedTodoId = briteDatabase
           .executeUpdateDelete(updateTodoString.table, updateTodoString.program);
-      Timber.d("DbCrudHelper:updateTodoString: todoId %s is updated", updatedTodoId);
+      Timber.d("DbCrudHelper:updateTodo: todoId %s is updated", updatedTodoId);
     }
 
     if (addedTagStr.length() != 0) {
@@ -351,7 +352,7 @@ public class DbCrudHelper {
         briteDatabase.executeInsert(insertTodoTag.table, insertTodoTag.program);
         insertCount++;
       }
-      Timber.d("DbCrudHelper:updateTodoString: %s rows ar deleted and "
+      Timber.d("DbCrudHelper:updateTodo: %s rows ar deleted and "
           + "%s rows are inserted to linkTable", deletedRows, insertCount);
       transaction.markSuccessful();
     } finally {

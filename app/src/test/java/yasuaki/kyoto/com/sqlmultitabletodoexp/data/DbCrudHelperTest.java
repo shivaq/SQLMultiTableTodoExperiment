@@ -1,4 +1,4 @@
-package yasuaki.kyoto.com.sqlmultitabletodoexp;
+package yasuaki.kyoto.com.sqlmultitabletodoexp.data;
 
 
 import static org.assertj.core.api.BDDAssertions.then;
@@ -14,6 +14,8 @@ import org.junit.runner.RunWith;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.annotation.Config;
+import yasuaki.kyoto.com.sqlmultitabletodoexp.BuildConfig;
+import yasuaki.kyoto.com.sqlmultitabletodoexp.MockModel;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.local.DbCrudHelper;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.local.DbOpenHelper;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.Tag;
@@ -128,7 +130,7 @@ public class DbCrudHelperTest {
     // When update
     for (int i = 0; i < updateTodoArray.length; i++) {
       dbCrudHelper
-          .updateTodoString(updateTodoArray[updateTodoArray.length - 1 - i], true, "",
+          .updateTodo(updateTodoArray[updateTodoArray.length - 1 - i], true, "",
               todoList.get(i)._id(),
               null);
     }
@@ -163,7 +165,7 @@ public class DbCrudHelperTest {
     // When update
     for (int i = 0; i < updateTagArray.length; i++) {
       dbCrudHelper
-          .updateTodoString("", true, updateTagArray[i],
+          .updateTodo("", true, updateTagArray[i],
               todoList.get(i)._id(),
               null);
     }
@@ -203,7 +205,7 @@ public class DbCrudHelperTest {
 
     // When update
     long todoId = todoList.get(3)._id();
-    dbCrudHelper.updateTodoString("", false, "", todoId, checkedTagIdList);
+    dbCrudHelper.updateTodo("", false, "", todoId, checkedTagIdList);
 
     // When load
     tagIdList = dbCrudHelper.loadTagForTodo(todoId).toBlocking().first();
@@ -245,7 +247,7 @@ public class DbCrudHelperTest {
     for (int i = 0; i < todoList.size(); i++) {
       // each todoItem checks every tag.
       dbCrudHelper
-          .updateTodoString(updateTodoArray[i], true, updateTagArray[i], todoList.get(i)._id(),
+          .updateTodo(updateTodoArray[i], true, updateTagArray[i], todoList.get(i)._id(),
               checkedTagIdList);
     }
 

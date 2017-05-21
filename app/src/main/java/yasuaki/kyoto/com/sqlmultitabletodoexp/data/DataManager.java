@@ -31,12 +31,6 @@ public class DataManager {
   }
 
   public Observable<List<Todo>> loadTodo() {
-
-
-
-    todolisttest = dbCrudHelper.loadTodo().toBlocking().first();
-    Timber.d("DataManager:loadTodo: todolisttest has %s todos", todolisttest.size());
-
     return dbCrudHelper.loadTodo();
   }
 
@@ -67,7 +61,7 @@ public class DataManager {
 
   public void updateTodo(String addedTodo, boolean isTodoChanged, String addedTagStr,
       long todoId, List<Long> checkedTagIdList) {
-    dbCrudHelper.updateTodoString(addedTodo, isTodoChanged, addedTagStr, todoId, checkedTagIdList);
+    dbCrudHelper.updateTodo(addedTodo, isTodoChanged, addedTagStr, todoId, checkedTagIdList);
   }
 
   public int deleteTodo(long todoId) {
