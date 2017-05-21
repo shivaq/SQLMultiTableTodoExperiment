@@ -172,7 +172,7 @@ public class DbCrudHelperTest {
 
     // then
     for (int i = 0; i < updateTagArray.length; i++) {
-      then(updateTagArray[i]).isEqualTo(tagList.get(i).tag());
+      then(tagStrArray.length + updateTagArray.length).isEqualTo(tagList.size());
     }
   }
 

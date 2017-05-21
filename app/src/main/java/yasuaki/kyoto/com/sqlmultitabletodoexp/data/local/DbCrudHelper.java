@@ -97,12 +97,9 @@ public class DbCrudHelper {
           public List<Todo> call(Cursor cursor) {
             List<Todo> todoList = new ArrayList<>();
             try {
-              if (cursor.moveToFirst()) {
-                for (int i = 0; i < cursor.getCount(); i++) {
-                  Todo allTodo = Todo.SELECT_ALL_MAPPER.map(cursor);
-                  todoList.add(allTodo);
-                  cursor.moveToNext();
-                }
+              while (cursor.moveToNext()) {
+                Todo allTodo = Todo.SELECT_ALL_MAPPER.map(cursor);
+                todoList.add(allTodo);
               }
             } finally {
               cursor.close();
@@ -130,12 +127,9 @@ public class DbCrudHelper {
           public List<Tag> call(Cursor cursor) {
             List<Tag> tagList = new ArrayList<>();
             try {
-              if (cursor.moveToFirst()) {
-                for (int i = 0; i < cursor.getCount(); i++) {
-                  Tag tag = Tag.TAG_ROW_MAPPER.map(cursor);
-                  tagList.add(tag);
-                  cursor.moveToNext();
-                }
+              while (cursor.moveToNext()) {
+                Tag tag = Tag.TAG_ROW_MAPPER.map(cursor);
+                tagList.add(tag);
               }
             } finally {
               cursor.close();
@@ -161,7 +155,7 @@ public class DbCrudHelper {
           public List<Long> call(Cursor cursor) {
             List<Long> tagIdForTodoList = new ArrayList<>();
             try {
-              while(cursor.moveToNext()){
+              while (cursor.moveToNext()) {
                 long tagId = Tag.TAG_ID_FOR_TODO_MAPPER.map(cursor);
                 tagIdForTodoList.add(tagId);
                 Timber.d("DbCrudHelper:call: cursor count is %s", cursor.getCount());
@@ -169,7 +163,8 @@ public class DbCrudHelper {
             } finally {
               cursor.close();
             }
-            Timber.d("DbCrudHelper:call: tagIdForTodoList is %s, size is %s", tagIdForTodoList, tagIdForTodoList.size());
+            Timber.d("DbCrudHelper:call: tagIdForTodoList is %s, size is %s", tagIdForTodoList,
+                tagIdForTodoList.size());
             return tagIdForTodoList;
           }
         });
@@ -194,7 +189,7 @@ public class DbCrudHelper {
           @Override
           public List<TodoForTag> call(Cursor cursor) {
             try {
-              while(cursor.moveToNext()){
+              while (cursor.moveToNext()) {
                 TodoForTag todoForTag = Todo.SELECT_TODO_FOR_TAG_MAPPER.map(cursor);
                 todoForTagList.add(todoForTag);
               }
@@ -229,13 +224,10 @@ public class DbCrudHelper {
           public List<TagWithTodoCounts> call(Cursor cursor) {
             List<TagWithTodoCounts> tagWithTodoCountsList = new ArrayList<>();
             try {
-              if (cursor.moveToFirst()) {
-                for (int i = 0; i < cursor.getCount(); i++) {
-                  TagWithTodoCounts tagWithTodoCounts = Tag.TAGWITHTODOCOUNTS_ROW_MAPPER
-                      .map(cursor);
-                  tagWithTodoCountsList.add(tagWithTodoCounts);
-                  cursor.moveToNext();
-                }
+              while (cursor.moveToNext()) {
+                TagWithTodoCounts tagWithTodoCounts = Tag.TAGWITHTODOCOUNTS_ROW_MAPPER
+                    .map(cursor);
+                tagWithTodoCountsList.add(tagWithTodoCounts);
               }
             } finally {
               cursor.close();

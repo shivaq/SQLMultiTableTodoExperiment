@@ -40,5 +40,5 @@ WHERE _id = ?;
   */
  select_todo_for_tag:
 SELECT *
-FROM todo LEFT OUTER JOIN todo_tag ON todo._id = todo_tag.todo_id
+FROM todo INNER JOIN todo_tag ON todo._id = todo_tag.todo_id
 WHERE todo_tag.tag_id = ?;
