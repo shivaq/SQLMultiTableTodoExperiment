@@ -89,7 +89,7 @@ public class TagDetailActivity extends BaseActivity implements TagDetailMvpView 
       Timber.d("TagDetailActivity:setTodoForTagList:todoId is %s, todo is %s", todoForTag.todo_tag().todo_id(),todoForTag.todo() );
       todoList.add(todoForTag.todo());
     }
-    Timber.d("TagDetailActivity:setTodoForTagList: todoList size is %s, todoForTagList size is %s", todoList.get(0), todoForTagList.size());
+//    Timber.d("TagDetailActivity:setTodoForTagList: todoList size is %s, todoForTagList size is %s", todoList.get(0), todoForTagList.size());
     rvAdapterTagDetail.setTodoList(todoList);
     RvTagEdit.setAdapter(rvAdapterTagDetail);
   }

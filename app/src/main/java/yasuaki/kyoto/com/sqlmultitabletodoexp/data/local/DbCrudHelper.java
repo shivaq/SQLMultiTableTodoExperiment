@@ -161,23 +161,23 @@ public class DbCrudHelper {
           public List<Long> call(Cursor cursor) {
             List<Long> tagIdForTodoList = new ArrayList<>();
             try {
-              if (cursor.moveToFirst()) {
-                for (int i = 0; i < cursor.getCount(); i++) {
-                  long tagId = Tag.TAG_ID_FOR_TODO_MAPPER.map(cursor);
-                  tagIdForTodoList.add(tagId);
-
-                  cursor.moveToNext();
-                }
+              while(cursor.moveToNext()){
+                long tagId = Tag.TAG_ID_FOR_TODO_MAPPER.map(cursor);
+                tagIdForTodoList.add(tagId);
+                Timber.d("DbCrudHelper:call: cursor count is %s", cursor.getCount());
               }
             } finally {
               cursor.close();
             }
+            Timber.d("DbCrudHelper:call: tagIdForTodoList is %s, size is %s", tagIdForTodoList, tagIdForTodoList.size());
             return tagIdForTodoList;
           }
         });
   }
 
+
   public Observable<List<TodoForTag>> loadTodoForTag(long tagId) {
+    List<TodoForTag> todoForTagList = new ArrayList<>();
     SqlDelightStatement selectTodosForTag =
         Todo.TODO_FACTORY.select_todo_for_tag(tagId);
     return briteDatabase.createQuery(
@@ -193,15 +193,10 @@ public class DbCrudHelper {
 
           @Override
           public List<TodoForTag> call(Cursor cursor) {
-            List<TodoForTag> todoForTagList = new ArrayList<>();
             try {
-              if (cursor.moveToFirst()) {
-                for (int i = 0; i < cursor.getCount(); i++) {
-
-                  TodoForTag todoForTag = Todo.SELECT_TODO_FOR_TAG_MAPPER.map(cursor);
-                  todoForTagList.add(todoForTag);
-                  cursor.moveToNext();
-                }
+              while(cursor.moveToNext()){
+                TodoForTag todoForTag = Todo.SELECT_TODO_FOR_TAG_MAPPER.map(cursor);
+                todoForTagList.add(todoForTag);
               }
             } finally {
               cursor.close();
