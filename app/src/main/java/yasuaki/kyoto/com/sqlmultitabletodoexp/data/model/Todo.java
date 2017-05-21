@@ -9,6 +9,10 @@ import yasuaki.kyoto.com.sqlmultitabletodoexp.data.DateAdapter;
 @AutoValue
 public abstract class Todo implements TodoModel, Parcelable {
 
+  public static Todo create(long _id, String todoStr,long registerredDate, long updatedDate, boolean isChecked ){
+    return new AutoValue_Todo(_id, todoStr, registerredDate, updatedDate, isChecked);
+  }
+
   private static final DateAdapter DATE_ADAPTER = new DateAdapter();
 
   // SQL の INSERT ステートメントに対応する

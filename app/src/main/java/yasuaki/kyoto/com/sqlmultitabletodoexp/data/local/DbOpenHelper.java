@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.database.sqlite.SQLiteTransactionListener;
+import android.support.annotation.VisibleForTesting;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import timber.log.Timber;
@@ -16,7 +17,7 @@ import yasuaki.kyoto.com.sqlmultitabletodoexp.di.ApplicationContext;
 public class DbOpenHelper extends SQLiteOpenHelper implements SQLiteTransactionListener {
 
   public static final int DATABASE_VERSION = 16;
-  private static final String DATABASE_NAME = "todo.db";
+  public static final String DATABASE_NAME = "todo.db";
 
   @Inject
   public DbOpenHelper(@ApplicationContext Context context) {
@@ -141,6 +142,14 @@ public class DbOpenHelper extends SQLiteOpenHelper implements SQLiteTransactionL
   @Override
   public void onRollback() {
     Timber.d("DbOpenHelper:onRollback: rollback transaction");
+
+  }
+
+
+  // use for in memory database for tests
+  @VisibleForTesting
+  DbOpenHelper(@ApplicationContext Context context, String name, int version){
+    super(context, name, null, version);
 
   }
 }

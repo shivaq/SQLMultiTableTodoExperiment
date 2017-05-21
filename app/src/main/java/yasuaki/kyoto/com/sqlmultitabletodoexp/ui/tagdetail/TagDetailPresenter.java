@@ -40,28 +40,29 @@ class TagDetailPresenter implements BasePresenter<TagDetailMvpView> {
   /*********************** save update delete ****************************/
 
   /********************************** load ************************************/
+
   public void loadTodoForTag(long tagId) {
     subscription.add(
         dataManager.loadTodoForTag(tagId)
-        .subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
             .subscribe(new Subscriber<List<TodoForTag>>() {
 
-          @Override
-          public void onCompleted() {
+              @Override
+              public void onCompleted() {
 
-          }
+              }
 
-          @Override
-          public void onError(Throwable e) {
+              @Override
+              public void onError(Throwable e) {
 
-          }
+              }
 
-          @Override
-          public void onNext(List<TodoForTag> todoForTagList) {
-            tagDetailMvpView.setTodoForTagList(todoForTagList);
-          }
-        })
+              @Override
+              public void onNext(List<TodoForTag> todoForTagList) {
+                tagDetailMvpView.setTodoForTagList(todoForTagList);
+              }
+            })
     );
 
   }

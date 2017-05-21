@@ -62,6 +62,7 @@ public class MainPresenter implements BasePresenter<MainMvpView> {
 
               @Override
               public void onNext(List<Todo> todoList) {
+                Timber.d("MainPresenter:onNext: todoList from DbCrudHelper size is %s", todoList.size());
                 mainMvpView.setTodo(todoList);
                 // todo:check if loadTodo is invoked twice and correct it to once
                 Timber.d("MainPresenter:onNext: success loading list size is %s", todoList.size());
