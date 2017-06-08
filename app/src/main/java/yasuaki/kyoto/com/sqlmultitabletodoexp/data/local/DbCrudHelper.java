@@ -36,6 +36,7 @@ import yasuaki.kyoto.com.sqlmultitabletodoexp.data.model.TodoTag;
 public class DbCrudHelper {
 
   private final BriteDatabase briteDatabase;
+  private DbOpenHelper openHelper;
 
   private Todo.Insert_todo insertTodo;
   private Todo.Update_isChecked updateTodoIsChecked;
@@ -45,7 +46,7 @@ public class DbCrudHelper {
   private TodoTag.Insert_todo_tag insertTodoTag;
   private TodoTag.Delete_todo_by_todo_id deleteTodoByTodoId;
 
-  private DbOpenHelper openHelper;
+
 
   @Inject
   public DbCrudHelper(DbOpenHelper openHelper) {

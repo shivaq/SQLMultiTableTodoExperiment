@@ -48,12 +48,12 @@ public class RvAdapterForTodoTag extends RecyclerView.Adapter<TagRvViewHolder> {
     CheckBox tagCB = holder.tagCB;
     holder.tagTv.setText(plainTagStr);
 
-    // チェック状態のタグリストに、このアイテムポジションに対応する、タグがあれば true
-    if (checkedTagIdForTodoList != null && checkedTagIdForTodoList.contains(plainTagId)) {
-      // ソフトウェアキーボードを閉じても、未チェック CB がチェックされてしまう現象がおきる
-      // 最悪の場合、リンクテーブルに isChecked 列を入れる（Main の todoList みたいに）
-      tagCB.setChecked(true);
-    }
+    // reset tagCB state to prevent odd checked state problem
+    tagCB.setOnCheckedChangeListener(null);
+    tagCB.setChecked(false);
+
+
+    tagCB.setChecked(checkedTagIdForTodoList != null && checkedTagIdForTodoList.contains(plainTagId));
 
     // Listener for CheckBox
     tagCB.setOnClickListener(new OnClickListener() {

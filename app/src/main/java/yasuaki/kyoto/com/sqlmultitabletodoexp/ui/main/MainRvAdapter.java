@@ -144,7 +144,7 @@ public class MainRvAdapter extends RecyclerView.Adapter<MainRvViewHolder> {
       ButterKnife.bind(this, itemView);
     }
 
-    // CallBack メソッドを、ViewHolder 内のクリックListenerからも呼び出せる
+    // RecyclerView の スクロールポジションを復元
     @OnClick(R.id.container_rv_item_todo)
     void onRvTodoClicked() {
       int adapterPosition = getAdapterPosition();

@@ -306,7 +306,7 @@ public class AddEditActivity extends BaseActivity implements AddEditMvpView {
       for (Tag existedTag : plainTagList) {
         if (existedTag.tag().equals(addedTagStr)) {
           if (checkedTagIdList == null) {
-            checkedTagIdList = new ArrayList();
+            checkedTagIdList = new ArrayList<>();
           }
           // 既存のTag がチェックされたとして登録
           checkedTagIdList.add(existedTag._id());

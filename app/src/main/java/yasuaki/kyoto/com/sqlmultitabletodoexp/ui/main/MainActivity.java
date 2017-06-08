@@ -23,7 +23,8 @@ import yasuaki.kyoto.com.sqlmultitabletodoexp.ui.base.BaseActivity;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.ui.main.MainRvAdapter.RvCallback;
 import yasuaki.kyoto.com.sqlmultitabletodoexp.ui.taglist.TagListActivity;
 
-public class MainActivity extends BaseActivity implements MainMvpView, RvCallback {
+public class MainActivity extends BaseActivity
+    implements MainMvpView, RvCallback {
 
   // Inject Presenter from an object graph
   @Inject

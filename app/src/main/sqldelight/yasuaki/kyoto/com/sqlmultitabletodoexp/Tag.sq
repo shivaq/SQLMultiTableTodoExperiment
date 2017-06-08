@@ -2,7 +2,6 @@ CREATE TABLE tag(
   _id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   tag TEXT NOT NULL,
   registerd_date INTEGER NOT NULL
-
 );
 
 insert_tag:
